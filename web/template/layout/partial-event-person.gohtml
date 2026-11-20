@@ -18,32 +18,32 @@
                         {{ $newValue := index $v 1 }}
 
                         {{ if eq $k "dob" }}
-                            <li>Date of birth: {{ parseAndFormatDate $oldValue.date "2006-01-02 00:00:00.000000" "02/01/2006" }} changed to: {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006"  }}</li>
+                            <li>Date of birth: {{ parseAndFormatDate $oldValue.date "2006-01-02 15:04:05" "02/01/2006" }} changed to: {{ parseAndFormatDate $newValue.date "2006-01-02 15:04:05" "02/01/2006"  }}</li>
                         {{ else if eq $k "noticeGivenDate" }}
-                            <li>Date notice given: {{ parseAndFormatDate $oldValue.date "2006-01-02 00:00:00.000000" "02/01/2006" }} changed to: {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006"  }}</li>
+                            <li>Date notice given: {{ parseAndFormatDate $oldValue.date "2006-01-02 15:04:05" "02/01/2006" }} changed to: {{ parseAndFormatDate $newValue.date "2006-01-02 15:04:05" "02/01/2006"  }}</li>
                         {{ else if eq $k "systemStatus" }}
                             <li>Changed from {{ if $oldValue }}active{{ else }}inactive{{ end }} to: {{ if $newValue }}active{{ else }}inactive{{ end }}</li>
                         {{ else if isDateMap $newValue}}
-                            <li>{{ camelcaseToSentence $k }}: {{ parseAndFormatDate $oldValue.date "2006-01-02 00:00:00.000000" "02/01/2006" }} changed to: {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006"  }}</li>
+                            <li>{{ camelcaseToSentence $k }}: {{ parseAndFormatDate $oldValue.date "2006-01-02 15:04:05" "02/01/2006" }} changed to: {{ parseAndFormatDate $newValue.date "2006-01-02 15:04:05" "02/01/2006"  }}</li>
                         {{ else }}
                             <li>{{ camelcaseToSentence $k }}: {{ $oldValue }} changed to: {{ $newValue }}</li>
                         {{ end }}
                     {{ else }}
                         {{ $newValue := "" }}
                         {{ if isMap $v }}
-                          {{ $newValue = index $v "1" }}
+                            {{ $newValue = index $v "1" }}
                         {{ else }}
-                          {{ $newValue = index $v 0 }}
+                            {{ $newValue = index $v 0 }}
                         {{ end }}
 
                         {{ if eq $k "dob" }}
-                            <li>Date of birth: {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006"  }}</li>
+                            <li>Date of birth: {{ parseAndFormatDate $newValue.date "2006-01-02 15:04:05" "02/01/2006"  }}</li>
                         {{ else if eq $k "noticeGivenDate" }}
-                            <li>Date notice given: {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006"  }}</li>
+                            <li>Date notice given: {{ parseAndFormatDate $newValue.date "2006-01-02 15:04:05" "02/01/2006"  }}</li>
                         {{ else if eq $k "systemStatus" }}
                             <li>Changed to: {{ if $newValue }}active{{ else }}inactive{{ end }}</li>
                         {{ else if isDateMap $newValue }}
-                            <li>{{ camelcaseToSentence $k }}: {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006"  }}</li>
+                            <li>{{ camelcaseToSentence $k }}: {{ parseAndFormatDate $newValue.date "2006-01-02 15:04:05" "02/01/2006"  }}</li>
                         {{ else }}
                             <li>{{ camelcaseToSentence $k }}: {{ $newValue }}</li>
                         {{ end }}
