@@ -8,14 +8,14 @@ export default function documentListSort(scope) {
     if (select.dataset.documentListSortInit) return;
     select.dataset.documentListSortInit = "true";
 
-    const panel = select.dataset.documentSortPanel;
+    const pane = select.dataset.documentSortPane;
 
     select.addEventListener("change", function () {
       const value = this.value;
       if (!value) return;
 
       const table = document.querySelector(
-        `[data-module="moj-sortable-table"][data-document-sort-panel="${panel}"]`,
+        `[data-module="moj-sortable-table"][data-document-sort-pane="${pane}"]`,
       );
       if (!table) return;
 
