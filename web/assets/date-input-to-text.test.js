@@ -85,7 +85,7 @@ describe("Convert date input to text", () => {
       new KeyboardEvent("keydown", { key: "C", ctrlKey: true }),
     );
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith("16/11/2026");
-    dateInput.type = "date";
+    expect(dateInput.type).toBe("date");
   });
 
   test("it should copy the date input value to the clipboard when pressing meta + c", async () => {
@@ -93,7 +93,7 @@ describe("Convert date input to text", () => {
       new KeyboardEvent("keydown", { key: "C", metaKey: true }),
     );
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith("16/11/2026");
-    dateInput.type = "date";
+    expect(dateInput.type).toBe("date");
   });
 
   test("it should not change the field type if the control, meta, c and v keys are pressed independently", async () => {
