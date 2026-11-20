@@ -30,7 +30,7 @@ describe("Create notified person form", () => {
     cy.get("#f-postcode").type("S7R 9F9");
     cy.get("#f-country").type("Canada");
     cy.get("button[type=submit]").click();
-    cy.url().should("include", "create-lpa");
+    cy.url().should("include", "update-lpa");
   });
 
   it("redirects to notified person form when adding another", () => {
