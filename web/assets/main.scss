@@ -127,11 +127,17 @@ $app-case-page-action-panel-height: calc(
   gap: govuk-spacing(3);
 
   .govuk-label {
+    flex: 1 1 auto;
     margin-bottom: 0;
   }
 
-  .govuk-input {
+  .govuk-input,
+  .app-signed-date-row__value {
     flex: 0 0 33.3333%;
+  }
+
+  .app-signed-date-row__value {
+    margin: 0;
   }
 }
 
@@ -829,6 +835,20 @@ $app-case-page-action-panel-height: calc(
   }
 }
 
+.app-form--compact {
+  .govuk-form-group {
+    margin-bottom: govuk-spacing(3);
+  }
+
+  .govuk-fieldset__legend {
+    margin-bottom: govuk-spacing(1);
+  }
+
+  .govuk-details {
+    margin-bottom: govuk-spacing(3);
+  }
+}
+
 .action-panel__button {
   background: linear-gradient(
     to bottom,
@@ -1234,11 +1254,20 @@ $app-case-page-action-panel-height: calc(
   padding-top: $app-action-panel-top - $app-fixed-headers-height;
 }
 
+.app-\!-embedded .govuk-main-wrapper:has(#accordion-create-lpa),
+.app-\!-embedded .govuk-main-wrapper:has(.app-form--compact) {
+  padding-top: govuk-spacing(1);
+}
+
+.app-\!-embedded .govuk-main-wrapper:has(.app-form--compact) .govuk-back-link {
+  margin-top: govuk-spacing(1);
+}
+
 #accordion-create-lpa {
   border-bottom: none;
 
   .govuk-accordion__section {
-    margin-bottom: 15px;
+    margin-bottom: govuk-spacing(2);
     border: 1px solid $color-accordion-blue;
 
     &:not(.govuk-accordion__section--expanded):hover {
@@ -1246,23 +1275,28 @@ $app-case-page-action-panel-height: calc(
     }
   }
 
+  .govuk-accordion__section-header {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
   .govuk-accordion__section-button {
     padding-top: 0;
     padding-bottom: 0;
-    margin-bottom: 15px;
+    margin-bottom: govuk-spacing(1);
     border: none;
 
     .govuk-accordion__section-heading-text {
       background: $color-accordion-blue;
       color: white;
-      padding: 10px;
+      padding: govuk-spacing(1) govuk-spacing(2);
     }
 
     &:hover {
       .govuk-accordion__section-heading-text {
         background: $color-app-bg;
         color: $color-sirius-black;
-        padding: 10px;
+        padding: govuk-spacing(1) govuk-spacing(2);
       }
     }
 
@@ -1286,11 +1320,11 @@ $app-case-page-action-panel-height: calc(
   }
 
   .govuk-accordion__section-toggle {
-    padding-left: 10px;
+    padding-left: govuk-spacing(2);
   }
 
   .govuk-accordion__section-content {
-    padding: 15px;
+    padding: govuk-spacing(2);
     padding-top: 0;
 
     &[hidden] {
@@ -1304,5 +1338,50 @@ $app-case-page-action-panel-height: calc(
 
   .moj-alert__content--multiline {
     white-space: pre-line;
+  }
+
+  .govuk-summary-card {
+    margin-bottom: govuk-spacing(2);
+  }
+
+  .govuk-summary-card__title-wrapper {
+    padding: govuk-spacing(1) govuk-spacing(3);
+  }
+
+  .govuk-summary-card__content {
+    padding: govuk-spacing(2) govuk-spacing(3);
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .govuk-form-group {
+    margin-bottom: govuk-spacing(3);
+  }
+
+  .govuk-fieldset__legend {
+    margin-bottom: govuk-spacing(1);
+  }
+
+  .govuk-heading-s {
+    margin-bottom: govuk-spacing(2);
+  }
+
+  .govuk-details {
+    margin-bottom: govuk-spacing(2);
+  }
+
+  .govuk-section-break--m {
+    margin-top: govuk-spacing(2);
+    margin-bottom: govuk-spacing(2);
+  }
+
+  .app-button-group--column {
+    margin-bottom: 0;
+
+    .govuk-button {
+      margin-bottom: 0;
+    }
   }
 }
