@@ -34,8 +34,7 @@ func UpdateLpa(client UpdateLpaClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		caseIdStr := r.FormValue("caseId")
-		caseId, err := strToIntOrStatusError(caseIdStr)
+		caseId, err := strToIntOrStatusError(r.FormValue("caseId"))
 		if err != nil {
 			return err
 		}
