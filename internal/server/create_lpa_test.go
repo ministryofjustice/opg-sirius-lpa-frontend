@@ -23,11 +23,6 @@ func (m *mockCreateLpaClient) Person(ctx sirius.Context, id int) (sirius.Person,
 	return args.Get(0).(sirius.Person), args.Error(1)
 }
 
-func (m *mockCreateLpaClient) Lpa(ctx sirius.Context, id int) (sirius.Lpa, error) {
-	args := m.Called(ctx, id)
-	return args.Get(0).(sirius.Lpa), args.Error(1)
-}
-
 func (m *mockCreateLpaClient) CreateLpa(ctx sirius.Context, donorID int, lpa sirius.Lpa) (sirius.Lpa, error) {
 	args := m.Called(ctx, donorID, lpa)
 	return args.Get(0).(sirius.Lpa), args.Error(1)
@@ -90,34 +85,6 @@ func TestGetCreateLpaHtmxRequest(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
-}
-
-func TestGetCreateLpaDoesNotSetIsUpdate(t *testing.T) {
-	client := &mockCreateLpaClient{}
-	client.
-		On("Person", mock.Anything, 123).
-		Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
-
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, lpaData{
-			AllowNewNotifiedPerson: true,
-			DonorId:                123,
-			DonorName:              "Firstname Surname",
-			FlowQuery:              "&flow=create",
-			IsCreating:             true,
-			IsUpdate:               false,
-			Title:                  "Create an LPA",
-		}).
-		Return(nil)
-
-	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
-	w := httptest.NewRecorder()
-
-	err := CreateLpa(client, template.Func)(w, r)
-
-	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 

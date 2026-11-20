@@ -34,8 +34,7 @@ func UpdateLpa(client UpdateLpaClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		caseIdStr := r.FormValue("caseId")
-		caseId, err := strToIntOrStatusError(caseIdStr)
+		caseId, err := strToIntOrStatusError(r.FormValue("caseId"))
 		if err != nil {
 			return err
 		}
@@ -56,7 +55,6 @@ func UpdateLpa(client UpdateLpaClient, tmpl template.Template) Handler {
 			DonorName:              donor.Firstname + " " + donor.Surname,
 			IsCreating:             isCreating,
 			IsPartial:              ctx.IsPartial,
-			IsUpdate:               true,
 			Lpa:                    lpa,
 			Title:                  "Edit LPA",
 			XSRFToken:              ctx.XSRFToken,
@@ -166,10 +164,6 @@ func UpdateLpa(client UpdateLpaClient, tmpl template.Template) Handler {
 
 			if !*lpa.AnyOtherInfo {
 				lpa.AdditionalInfo = ""
-			}
-
-			if !data.IsUpdate {
-				lpa.ReceiptDate = postFormDateString(r, "receiptDate")
 			}
 
 			data.AppointmentType = caseAttorneyValue

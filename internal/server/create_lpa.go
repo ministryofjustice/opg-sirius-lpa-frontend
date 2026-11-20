@@ -11,7 +11,6 @@ import (
 
 type CreateLpaClient interface {
 	Person(sirius.Context, int) (sirius.Person, error)
-	Lpa(sirius.Context, int) (sirius.Lpa, error)
 	CreateLpa(ctx sirius.Context, donorID int, lpa sirius.Lpa) (sirius.Lpa, error)
 }
 
@@ -27,7 +26,6 @@ type lpaData struct {
 	HtmxRedirect                         string
 	HtmxSwap                             string
 	IsCreating                           bool
-	IsUpdate                             bool
 	FlowQuery                            string
 	Lpa                                  sirius.Lpa
 	ReplacementAttorneyTrustCorporations []sirius.TrustCorporation

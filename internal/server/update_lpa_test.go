@@ -77,7 +77,6 @@ func TestGetUpdateLpa(t *testing.T) {
 					CaseId:                 456,
 					DonorId:                123,
 					DonorName:              "Firstname Surname",
-					IsUpdate:               true,
 					Lpa:                    tc.lpa,
 					ReplacementAttorneys:   []sirius.Attorney{},
 					Title:                  "Edit LPA",
@@ -136,7 +135,6 @@ func TestGetUpdateLpaWithTrustCorporations(t *testing.T) {
 				CaseId:                 456,
 				DonorId:                123,
 				DonorName:              "Firstname Surname",
-				IsUpdate:               true,
 				Lpa:                    lpa,
 				Title:                  "Edit LPA",
 			}
@@ -668,7 +666,6 @@ func TestPostUpdateLpaWhenValidationError(t *testing.T) {
 		On("Func", mock.Anything, mock.MatchedBy(func(d lpaData) bool {
 			return d.Error.Error() == expectedError.Error() &&
 				!d.Success &&
-				d.IsUpdate &&
 				d.CaseId == 456 &&
 				reflect.DeepEqual(d.Lpa, submittedLpa)
 		})).
@@ -934,7 +931,6 @@ func TestPostUpdateLpaErrorWhenAttorneyRadioSelected(t *testing.T) {
 			},
 			FlowQuery:            "&flow=create",
 			IsCreating:           true,
-			IsUpdate:             true,
 			ReplacementAttorneys: []sirius.Attorney{},
 			Lpa: sirius.Lpa{
 				Case: sirius.Case{
