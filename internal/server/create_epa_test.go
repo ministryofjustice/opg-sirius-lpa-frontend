@@ -37,7 +37,7 @@ func TestGetCreateEpa(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, createEpaData{
+		On("Func", mock.Anything, epaData{
 			DonorId: 123,
 			Title:   "Create an EPA",
 		}).
@@ -59,7 +59,7 @@ func TestGetCreateEpaHtmxRequest(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, createEpaData{
+		On("Func", mock.Anything, epaData{
 			DonorId:   123,
 			Title:     "Create an EPA",
 			IsPartial: true,
@@ -94,7 +94,7 @@ func TestGetCreateEpaEdit(t *testing.T) {
 
 			template := &mockTemplate{}
 			template.
-				On("Func", mock.Anything, createEpaData{
+				On("Func", mock.Anything, epaData{
 					DonorId:         123,
 					Title:           "Edit EPA",
 					Epa:             epa,
@@ -183,7 +183,7 @@ func TestPostCreateEpa(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, createEpaData{
+		On("Func", mock.Anything, epaData{
 			DonorId:         123,
 			Title:           "Create an EPA",
 			Success:         true,
@@ -261,7 +261,7 @@ func TestPostCreateEpaEdit(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, createEpaData{
+		On("Func", mock.Anything, epaData{
 			DonorId:         123,
 			Title:           "Edit EPA",
 			Success:         true,
@@ -441,7 +441,7 @@ func TestPostCreateEpaWhenValidationError(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, createEpaData{
+		On("Func", mock.Anything, epaData{
 			DonorId:         123,
 			Title:           "Create an EPA",
 			Success:         false,
@@ -497,7 +497,7 @@ func TestPostCreateEpaWhenValidationErrorHtmxRequest(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, createEpaData{
+		On("Func", mock.Anything, epaData{
 			DonorId:   123,
 			Title:     "Create an EPA",
 			Success:   false,
@@ -554,7 +554,7 @@ func TestPostCreateEpaWhenValidationErrorOnReceiptDate(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, createEpaData{
+		On("Func", mock.Anything, epaData{
 			DonorId:         123,
 			Title:           "Create an EPA",
 			Success:         false,
@@ -621,7 +621,7 @@ func TestPostCreateEpaAddActorValidationErrorOnReceiptDate(t *testing.T) {
 
 			template := &mockTemplate{}
 			template.
-				On("Func", mock.Anything, createEpaData{
+				On("Func", mock.Anything, epaData{
 					DonorId:         123,
 					Title:           "Create an EPA",
 					Success:         false,
@@ -660,7 +660,7 @@ func TestGetCreateEpaDoesNotSetIsUpdate(t *testing.T) {
 	client := &mockCreateEpaClient{}
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, createEpaData{
+		On("Func", mock.Anything, epaData{
 			DonorId:  123,
 			Title:    "Create an EPA",
 			IsUpdate: false,
@@ -713,7 +713,7 @@ func TestPostCreateEpaEditWhenValidationError(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, createEpaData{
+		On("Func", mock.Anything, epaData{
 			DonorId:         123,
 			Title:           "Edit EPA",
 			IsUpdate:        true,
