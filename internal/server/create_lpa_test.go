@@ -23,11 +23,6 @@ func (m *mockCreateLpaClient) Person(ctx sirius.Context, id int) (sirius.Person,
 	return args.Get(0).(sirius.Person), args.Error(1)
 }
 
-func (m *mockCreateLpaClient) Lpa(ctx sirius.Context, id int) (sirius.Lpa, error) {
-	args := m.Called(ctx, id)
-	return args.Get(0).(sirius.Lpa), args.Error(1)
-}
-
 func (m *mockCreateLpaClient) CreateLpa(ctx sirius.Context, donorID int, lpa sirius.Lpa) (sirius.Lpa, error) {
 	args := m.Called(ctx, donorID, lpa)
 	return args.Get(0).(sirius.Lpa), args.Error(1)

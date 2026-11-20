@@ -136,8 +136,8 @@ func TestGetUpdateLpaWithTrustCorporations(t *testing.T) {
 				CaseId:                 456,
 				DonorId:                123,
 				DonorName:              "Firstname Surname",
-				IsUpdate:               true,
 				Lpa:                    lpa,
+				IsUpdate:               true,
 				Title:                  "Edit LPA",
 			}
 
