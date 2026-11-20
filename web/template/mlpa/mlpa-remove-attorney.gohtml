@@ -31,7 +31,7 @@
                     {{ $activeAttorney.FirstNames }} {{ $activeAttorney.LastName }}
                     <br>
                     {{ if not (eq $activeAttorney.DateOfBirth "") }}
-                      {{ parseAndFormatDate $activeAttorney.DateOfBirth "2006-01-02" "2 January 2006" }}
+                      {{ parseAndFormatDate $activeAttorney.DateOfBirth "2006-01-02" "02/01/2006" }}
                     {{ end }}
                   </label>
                 </div>
@@ -74,7 +74,7 @@
                       {{ $inactiveAttorney.FirstNames }} {{ $inactiveAttorney.LastName }}
                       <br>
                       {{ if not (eq $inactiveAttorney.DateOfBirth "") }}
-                        {{ parseAndFormatDate $inactiveAttorney.DateOfBirth "2006-01-02" "2 January 2006" }}
+                        {{ parseAndFormatDate $inactiveAttorney.DateOfBirth "2006-01-02" "02/01/2006" }}
                       {{ end }}
                     </label>
                   </div>
