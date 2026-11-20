@@ -9,69 +9,69 @@
           hx-trigger="load"
     ></span>
   {{ else }}
-  <div class="action-panel__form">
+    <div class="action-panel__form">
 
-    {{ template "error-summary" .Error }}
+      {{ template "error-summary" .Error }}
 
-    {{ if eq .CaseType "epa" }}
-      <a class="govuk-back-link"
-         href=""
-         hx-get="{{ prefix (printf "/update-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
-         hx-target=".action-panel__content"
-         hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">Back</a>
-    {{ else }}
-      <a class="govuk-back-link"
-         href=""
-         hx-get="{{ prefix (printf "/update-lpa?id=%d&caseId=%d%s#scroll-to-attorneys" .DonorId .CaseId .FlowQuery) }}"
-         hx-target=".action-panel__content"
-         hx-swap="innerHTML show:#scroll-to-attorneys:top">Back</a>
-    {{ end }}
-
-    <h1 class="govuk-heading-m">{{ .Title }}</h1>
-    {{ if and (not .IsEditing) (eq .CaseType "lpa") (eq .CaseSubType "pfa") }}
-      <div class="govuk-button-group govuk-button-group--row">
-        <a class="govuk-link govuk-link--no-visited-state"
+      {{ if eq .CaseType "epa" }}
+        <a class="govuk-back-link"
            href=""
-           hx-get="{{ prefix (printf "/create-trust-corporation?id=%d&caseId=%d%s" .DonorId .CaseId .FlowQuery) }}"
+           hx-get="{{ prefix (printf "/update-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
            hx-target=".action-panel__content"
-           hx-swap="innerHTML scroll:.action-panel__content:top">Add a trust corporation as an attorney</a>
-      </div>
-    {{ end }}
+           hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">Back</a>
+      {{ else }}
+        <a class="govuk-back-link"
+           href=""
+           hx-get="{{ prefix (printf "/update-lpa?id=%d&caseId=%d%s#scroll-to-attorneys" .DonorId .CaseId .FlowQuery) }}"
+           hx-target=".action-panel__content"
+           hx-swap="innerHTML show:#scroll-to-attorneys:top">Back</a>
+      {{ end }}
 
-    <form class="form"
-          method="POST"
-          hx-post={{ if .IsEditing }}"{{ prefix (printf "/update-attorney?id=%d&caseId=%d&caseType=%s&attorneyId=%d%s" .DonorId .CaseId .CaseType .Attorney.ID .FlowQuery) }}"{{ else }}"{{ prefix (printf "/create-attorney?id=%d&caseId=%d&caseType=%s%s" .DonorId .CaseId .CaseType .FlowQuery) }}"{{ end }}
-          hx-target=".action-panel__content"
-          hx-swap="innerHTML">
+      <h1 class="govuk-heading-m">{{ .Title }}</h1>
+      {{ if and (not .IsEditing) (eq .CaseType "lpa") (eq .CaseSubType "pfa") }}
+        <div class="govuk-button-group govuk-button-group--row">
+          <a class="govuk-link govuk-link--no-visited-state"
+             href=""
+             hx-get="{{ prefix (printf "/create-trust-corporation?id=%d&caseId=%d%s" .DonorId .CaseId .FlowQuery) }}"
+             hx-target=".action-panel__content"
+             hx-swap="innerHTML scroll:.action-panel__content:top">Add a trust corporation as an attorney</a>
+        </div>
+      {{ end }}
+
+      <form class="form app-form--compact"
+            method="POST"
+            hx-post={{ if .IsEditing }}"{{ prefix (printf "/update-attorney?id=%d&caseId=%d&caseType=%s&attorneyId=%d%s" .DonorId .CaseId .CaseType .Attorney.ID .FlowQuery) }}"{{ else }}"{{ prefix (printf "/create-attorney?id=%d&caseId=%d&caseType=%s%s" .DonorId .CaseId .CaseType .FlowQuery) }}"{{ end }}
+      hx-target=".action-panel__content"
+      hx-swap="innerHTML">
 
       {{ template "form-content" . }}
 
-      <div class="govuk-button-group govuk-!-padding-top-5">
-          <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
-          {{ if not .IsEditing }}
-            <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another" value="Save and add another attorney" />
-          {{ end }}
-          {{ if ne .NextAttorneyId 0 }}
-            <input class="govuk-button" data-module="govuk-button" type="submit" name="update-next-attorney" value="Save and update next attorney" />
-          {{ end }}
+      <div class="govuk-button-group govuk-!-padding-top-2">
+        <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+        {{ if not .IsEditing }}
+          <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another" value="Save and add another attorney" />
+        {{ end }}
+        {{ if ne .NextAttorneyId 0 }}
+          <input class="govuk-button" data-module="govuk-button" type="submit" name="update-next-attorney" value="Save and update next attorney" />
+        {{ end }}
 
-          {{ if eq .CaseType "epa" }}
-            <a class="govuk-link govuk-link--no-visited-state"
-               href=""
-               hx-get="{{ prefix (printf "/update-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
-               hx-target=".action-panel__content"
-               hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">Cancel</a>
-          {{ else }}
-            <a class="govuk-link govuk-link--no-visited-state"
-               href=""
-               hx-get="{{ prefix (printf "/update-lpa?id=%d&caseId=%d%s#scroll-to-attorneys" .DonorId .CaseId .FlowQuery) }}"
-               hx-target=".action-panel__content"
-               hx-swap="innerHTML show:#scroll-to-attorneys:top">Cancel</a>
-          {{ end }}
+        {{ if eq .CaseType "epa" }}
+          <a class="govuk-link govuk-link--no-visited-state"
+             href=""
+             hx-get="{{ prefix (printf "/update-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
+             hx-target=".action-panel__content"
+             hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">Cancel</a>
+        {{ else }}
+          <a class="govuk-link govuk-link--no-visited-state"
+             href=""
+             hx-get="{{ prefix (printf "/update-lpa?id=%d&caseId=%d%s#scroll-to-attorneys" .DonorId .CaseId .FlowQuery) }}"
+             hx-target=".action-panel__content"
+             hx-swap="innerHTML show:#scroll-to-attorneys:top">Cancel</a>
+        {{ end }}
       </div>
-    </form>
-  </div>
- {{ end }}
+      </form>
+    </div>
+  {{ end }}
 {{ end }}
 
 {{ define "title" }}{{ if .Error.Any }}Error: {{ end }}{{ .Title }}{{ end }}
@@ -97,11 +97,11 @@
         </div>
       {{ end }}
 
-      <form class="form" method="POST">
+      <form class="form app-form--compact" method="POST">
 
         {{ template "form-content" . }}
 
-        <div class="govuk-button-group govuk-!-padding-top-5">
+        <div class="govuk-button-group govuk-!-padding-top-2">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
           {{ if not .IsEditing }}
             <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another" value="Save and add another attorney" />
@@ -137,25 +137,25 @@
   {{ template "input" (field "firstname" "First name" .Attorney.Firstname .Error.Field.firstname) }}
   {{ template "input" (field "middlenames" "Middle names" .Attorney.Middlenames .Error.Field.middlenames) }}
   {{ template "input" (field "surname" "Last name" .Attorney.Surname .Error.Field.surname) }}
-  {{ template "input-date" (field "dob" "Date of birth" .Attorney.DateOfBirth .Error.Field.dob "max" today) }}
+  {{ template "input-date" (field "dob" "Date of birth" .Attorney.DateOfBirth .Error.Field.dob "max" today "fullWidth" true) }}
 
   {{ if eq .CaseType "epa" }}
     {{ template "input" (field "companyName" "Company name" .Attorney.CompanyName .Error.Field.companyName) }}
   {{ end }}
 
   <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="Address" data-app-address-finder-fill-country="false">
-      {{ template "input" (field "addressLine1" "Address line 1" .Attorney.AddressLine1 .Error.Field.addressLine1 "data-app-address-finder-map" "addressLine1") }}
-      {{ template "input" (field "addressLine2" "Address line 2" .Attorney.AddressLine2 .Error.Field.addressLine2 "data-app-address-finder-map" "addressLine2") }}
-      {{ template "input" (field "addressLine3" "Address line 3" .Attorney.AddressLine3 .Error.Field.addressLine3 "data-app-address-finder-map" "addressLine3") }}
-      {{ template "input" (field "town" "Town" .Attorney.Town .Error.Field.town "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
-      {{ template "input" (field "county" "County" .Attorney.County .Error.Field.county) }}
-      {{ template "input" (field "postcode" "Postcode" .Attorney.Postcode .Error.Field.postcode "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
-      {{ template "input" (field "country" "Country" .Attorney.Country .Error.Field.country "data-app-address-finder-map" "country") }}
+    {{ template "input" (field "addressLine1" "Address line 1" .Attorney.AddressLine1 .Error.Field.addressLine1 "data-app-address-finder-map" "addressLine1") }}
+    {{ template "input" (field "addressLine2" "Address line 2" .Attorney.AddressLine2 .Error.Field.addressLine2 "data-app-address-finder-map" "addressLine2") }}
+    {{ template "input" (field "addressLine3" "Address line 3" .Attorney.AddressLine3 .Error.Field.addressLine3 "data-app-address-finder-map" "addressLine3") }}
+    {{ template "input" (field "town" "Town" .Attorney.Town .Error.Field.town "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
+    {{ template "input" (field "county" "County" .Attorney.County .Error.Field.county) }}
+    {{ template "input" (field "postcode" "Postcode" .Attorney.Postcode .Error.Field.postcode "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
+    {{ template "input" (field "country" "Country" .Attorney.Country .Error.Field.country "data-app-address-finder-map" "country") }}
 
-      {{ template "radios" (radios "isAirmailRequired" "Airmail required" ( stringifyBool .Attorney.IsAirmailRequired) .Error.Field.isAirmailRequired true
-      (item "true" "Yes")
-      (item "false" "No")
-      ) }}
+    {{ template "radios" (radios "isAirmailRequired" "Airmail required" ( stringifyBool .Attorney.IsAirmailRequired) .Error.Field.isAirmailRequired true
+    (item "true" "Yes")
+    (item "false" "No")
+    ) }}
   </div>
 
   {{ template "input" (field "phoneNumber" "Telephone number" .Attorney.PhoneNumber .Error.Field.phoneNumber) }}

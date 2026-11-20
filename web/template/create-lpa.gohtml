@@ -92,7 +92,7 @@
           <div class="govuk-summary-card__content">
             <div class="govuk-form-group {{ if .Error.Field.caseSubtype }}govuk-form-group--error{{ end }}">
               <fieldset class="govuk-fieldset">
-                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">LPA type</legend>
+                <legend class="govuk-fieldset__legend govuk-visually-hidden">LPA type</legend>
                 {{ template "errors" .Error.Field.caseSubtype }}
                 <div class="govuk-radios govuk-radios--small app-!-radios--inline {{ if .Error.Field.caseSubtype }}govuk-radios--error{{ end }}" data-module="govuk-radios">
                   <div class="govuk-radios__item">
@@ -110,11 +110,13 @@
             </div>
 
             {{ if not .IsUpdate }}
-              {{ template "input-date" (field "receiptDate" "Receipt date" .Lpa.ReceiptDate .Error.Field.receiptDate "max" today "boldLabel" true) }}
+              {{ template "input-signed-date" (field "receiptDate" "Receipt date" .Lpa.ReceiptDate .Error.Field.receiptDate "max" today "boldLabel" true) }}
             {{ else }}
               <div class="govuk-form-group">
-                <label class="govuk-label"><strong>Receipt date</strong></label>
-                <p class="govuk-body" id="f-receiptDate-readonly">{{ if .Lpa.ReceiptDate }}{{ formatDate .Lpa.ReceiptDate }}{{ else }}Not yet set{{ end }}</p>
+                <div class="app-signed-date-row">
+                  <span class="govuk-label"><strong>Receipt date</strong></span>
+                  <p class="govuk-body app-signed-date-row__value" id="f-receiptDate-readonly">{{ if .Lpa.ReceiptDate }}{{ formatDate .Lpa.ReceiptDate }}{{ else }}Not yet set{{ end }}</p>
+                </div>
               </div>
             {{ end }}
           </div>
@@ -196,7 +198,7 @@
               <fieldset class="govuk-fieldset">
                 <legend class="govuk-fieldset__legend govuk-visually-hidden">Appointment type</legend>
                 {{ template "errors" .Error.Field.appointmentType }}
-                <div class="govuk-radios govuk-radios--small{{ if .Error.Field.appointmentType }}govuk-radios--error{{ end }}" data-module="govuk-radios">
+                <div class="govuk-radios govuk-radios--small {{ if .Error.Field.appointmentType }}govuk-radios--error{{ end }}" data-module="govuk-radios">
                   <div class="govuk-radios__item">
                     <input class="govuk-radios__input" id="f-caseAttorney" name="caseAttorney" type="radio"
                            value="singular" {{ if eq .AppointmentType "singular" }}checked{{ end }}>
@@ -253,7 +255,7 @@
                             type="submit"
                             value="{{ .ID }}">Update
                       <span class="govuk-visually-hidden">
-                        trust corporation appointed as replacment attorney{{ if .CompanyName }} {{ .CompanyName }}{{ end }}
+                        trust corporation appointed as replacement attorney{{ if .CompanyName }} {{ .CompanyName }}{{ end }}
                       </span>
                     </button>
                   {{ else }}
@@ -320,7 +322,7 @@
                   </div>
                 </fieldset>
               </div>
-              {{ template "input-date" (field "lifeSustainingTreatmentSignatureDate" "Date signed" .Lpa.LifeSustainingTreatmentSignatureDateA .Error.Field.lifeSustainingTreatmentSignatureDate) }}
+              {{ template "input-signed-date" (field "lifeSustainingTreatmentSignatureDate" "Date signed" .Lpa.LifeSustainingTreatmentSignatureDateA .Error.Field.lifeSustainingTreatmentSignatureDate) }}
             </div>
           </div>
           <div data-module="app-lpa-form-subtype-pfa">
@@ -574,7 +576,7 @@
                 </div>
               </fieldset>
             </div>
-            {{ template "input-date" (field "applicantSignatureDate" "Date signed" .Lpa.ApplicantSignatureDate .Error.Field.applicantSignatureDate) }}
+            {{ template "input-signed-date" (field "applicantSignatureDate" "Date signed" .Lpa.ApplicantSignatureDate .Error.Field.applicantSignatureDate) }}
           </div>
         </div>
         <div class="govuk-summary-card">
@@ -627,51 +629,45 @@
             </h2>
           </div>
           <div class="govuk-summary-card__content">
-            <div class="govuk-form-group">
-              <div class="govuk-form-group {{ if .Error.Field.applicationType }}govuk-form-group--error{{ end }}">
-                <fieldset class="govuk-fieldset">
-                  <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Application type</legend>
-                  {{ template "errors" .Error.Field.applicationType }}
-                  <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
-                    <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="f-applicationType" name="applicationType" type="radio"
-                             value="Online" data-aria-controls="onlineLpaIdReveal"
-                             {{ if eq .Lpa.ApplicationType "Online" }}checked{{ end }}>
-                      <label class="govuk-label govuk-radios__label" for="f-applicationType">Online</label>
-                    </div>
-                    <div class="govuk-radios__conditional {{ if ne .Lpa.ApplicationType "Online" }}govuk-radios__conditional--hidden{{ end }}"
-                         id="onlineLpaIdReveal">
-                      <div class="govuk-form-group">
-                        {{ template "input" (field "onlineLpaId" "A-reference" .Lpa.OnlineLpaId .Error.Field.onlineLpaId) }}
-                      </div>
-                    </div>
-                    <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="f-applicationType-2" name="applicationType" type="radio"
-                             value="Classic" {{ if eq .Lpa.ApplicationType "Classic" }}checked{{ end }}>
-                      <label class="govuk-label govuk-radios__label" for="f-applicationType-2">Classic</label>
-                    </div>
+            <div class="govuk-form-group {{ if .Error.Field.applicationType }}govuk-form-group--error{{ end }}">
+              <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Application type</legend>
+                {{ template "errors" .Error.Field.applicationType }}
+                <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-applicationType" name="applicationType" type="radio"
+                           value="Online" data-aria-controls="onlineLpaIdReveal"
+                           {{ if eq .Lpa.ApplicationType "Online" }}checked{{ end }}>
+                    <label class="govuk-label govuk-radios__label" for="f-applicationType">Online</label>
                   </div>
-                </fieldset>
-              </div>
+                  <div class="govuk-radios__conditional {{ if ne .Lpa.ApplicationType "Online" }}govuk-radios__conditional--hidden{{ end }}"
+                       id="onlineLpaIdReveal">
+                    {{ template "input" (field "onlineLpaId" "A-reference" .Lpa.OnlineLpaId .Error.Field.onlineLpaId) }}
+                  </div>
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-applicationType-2" name="applicationType" type="radio"
+                           value="Classic" {{ if eq .Lpa.ApplicationType "Classic" }}checked{{ end }}>
+                    <label class="govuk-label govuk-radios__label" for="f-applicationType-2">Classic</label>
+                  </div>
+                </div>
+              </fieldset>
             </div>
             <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-            <div class="govuk-form-group">
-              <div class="govuk-form-group {{ if .Error.Field.continuationSheets }}govuk-form-group--error{{ end }}">
-                <fieldset class="govuk-fieldset">
-                  <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Continuation sheets</legend>
-                  {{ template "errors" .Error.Field.continuationSheets }}
-                  <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
-                    <div class="govuk-checkboxes__item">
-                      <input class="govuk-checkboxes__input" id="f-continuationSheets" name="continuationSheets"
-                             type="checkbox" value="continuationSheets"
-                             {{ if eq (stringifyBoolPointer .Lpa.ApplicationHasContinuationSheets) "true" }}checked{{ end }}>
-                      <label class="govuk-label govuk-checkboxes__label" for="f-continuationSheets">
-                        This LPA includes continuation sheets
-                      </label>
-                    </div>
+            <div class="govuk-form-group {{ if .Error.Field.continuationSheets }}govuk-form-group--error{{ end }}">
+              <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Continuation sheets</legend>
+                {{ template "errors" .Error.Field.continuationSheets }}
+                <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="f-continuationSheets" name="continuationSheets"
+                           type="checkbox" value="continuationSheets"
+                           {{ if eq (stringifyBoolPointer .Lpa.ApplicationHasContinuationSheets) "true" }}checked{{ end }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="f-continuationSheets">
+                      This LPA includes continuation sheets
+                    </label>
                   </div>
-                </fieldset>
-              </div>
+                </div>
+              </fieldset>
             </div>
           </div>
         </div>
@@ -704,9 +700,7 @@
             </div>
             <div class="govuk-checkboxes__conditional {{ if not (compareBoolPointers .Lpa.PaymentByDebitCreditCard true) }}govuk-checkboxes__conditional--hidden{{ end }}"
                  id="cardPaymentContactReveal">
-              <div class="govuk-form-group">
-                {{ template "input" (field "cardPaymentContact" "Contact details for credit or debit card" .Lpa.CardPaymentContact .Error.Field.cardPaymentContact) }}
-              </div>
+              {{ template "input" (field "cardPaymentContact" "Contact details for credit or debit card" .Lpa.CardPaymentContact .Error.Field.cardPaymentContact) }}
             </div>
             <div class="govuk-checkboxes__item">
               <input class="govuk-checkboxes__input" id="f-applicationFee-2" name="applicationFee"

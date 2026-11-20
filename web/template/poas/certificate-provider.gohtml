@@ -22,7 +22,7 @@
 
         <h1 class="govuk-heading-m">{{ .Title }}</h1>
 
-        <form class="form"
+        <form class="form app-form--compact"
               method="POST"
               hx-post="{{ prefix .PostURL }}"
               hx-target=".action-panel__content"
@@ -30,7 +30,7 @@
 
             {{ template "form-content" . }}
 
-            <div class="govuk-button-group govuk-!-padding-top-5">
+            <div class="govuk-button-group govuk-!-padding-top-2">
                 <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
                 <a class="govuk-link govuk-link--no-visited-state"
                    href=""
@@ -53,11 +53,11 @@
 
             <h1 class="govuk-heading-l">{{ .Title }}</h1>
 
-            <form class="form" method="POST">
+            <form class="form app-form--compact" method="POST">
 
                 {{ template "form-content" . }}
 
-                <div class="govuk-button-group govuk-!-padding-top-5">
+                <div class="govuk-button-group govuk-!-padding-top-2">
                     <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
                     <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/update-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-3" .DonorId .CaseId .FlowQuery) }}">Cancel</a>
                 </div>
