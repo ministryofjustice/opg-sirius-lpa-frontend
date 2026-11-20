@@ -9,30 +9,14 @@
           hx-trigger="load"
     ></span>
   {{ else }}
-  <div class="action-panel__form">
+    <div class="action-panel__form">
 
-    {{ template "error-summary" .Error }}
+      {{ template "error-summary" .Error }}
 
-    {{ if eq .CaseType "epa" }}
-      <a class="govuk-back-link"
-         href=""
-         hx-get="{{ prefix (printf "/update-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
-         hx-target=".action-panel__content"
-         hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">Back</a>
-    {{ else }}
-      <a class="govuk-back-link"
-         href=""
-         hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-attorneys" .DonorId .CaseId .FlowQuery) }}"
-         hx-target=".action-panel__content"
-         hx-swap="innerHTML show:#scroll-to-attorneys:top">Back</a>
-    {{ end }}
-
-    <h1 class="govuk-heading-m">{{ .Title }}</h1>
-    {{ if and (not .IsEditing) (eq .CaseType "lpa") (eq .CaseSubType "pfa") }}
-      <div class="govuk-button-group govuk-button-group--row">
-        <a class="govuk-link govuk-link--no-visited-state"
+      {{ if eq .CaseType "epa" }}
+        <a class="govuk-back-link"
            href=""
-           hx-get="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
+           hx-get="{{ prefix (printf "/update-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
            hx-target=".action-panel__content"
            hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">Back</a>
       {{ else }}
