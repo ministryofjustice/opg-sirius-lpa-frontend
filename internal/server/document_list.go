@@ -38,6 +38,7 @@ type documentPageData struct {
 	Success                        bool
 	SuccessMessage                 string
 	XSRFToken                      string
+	Pane                           int
 }
 
 func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
@@ -114,6 +115,7 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			Success:                        isSuccess,
 			SuccessMessage:                 successMessage,
 			XSRFToken:                      ctx.XSRFToken,
+			Pane:                           1,
 		}
 
 		uidParams := buildUIDQueryString(pageVars.CaseUidsCollection)

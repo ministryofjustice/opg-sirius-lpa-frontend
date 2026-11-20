@@ -76,7 +76,7 @@
                         <label class="govuk-label govuk-!-display-inline govuk-!-margin-right-2" for="document-sort">
                             Sort by
                         </label>
-                        <select class="govuk-select" id="document-sort" data-document-sort>
+                        <select class="govuk-select" id="document-sort" data-document-sort data-document-sort-panel="{{ .Panel }}">
                             <option value="">Select an option</option>
                             <option value="date-new-old">Date Created (New-Old)</option>
                             <option value="date-old-new">Date Created (Old-New)</option>
@@ -94,7 +94,7 @@
                     </div>
                 </div>
 
-                <table class="govuk-table" data-module="moj-sortable-table" aria-labelledby="document-list-title">
+                <table class="govuk-table" data-module="moj-sortable-table" data-document-sort-panel="{{ .Panel }}" aria-labelledby="document-list-title">
 
                     <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
