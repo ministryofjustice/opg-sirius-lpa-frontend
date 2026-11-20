@@ -102,6 +102,7 @@ htmx.on("htmx:afterSettle", (event) => {
     clearBlankSections(swapDetails.target);
     initSiriusHeader();
     showHideFilter(swapDetails.target);
+    documentListSort(swapDetails.target);
 
     // Update the action panel width if swapping in create-document or edit-document content
     if (swapDetails.target.id === "actions-content") {
