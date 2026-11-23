@@ -145,15 +145,21 @@ func UpdateAttorney(client UpdateAttorneyClient, tmpl template.Template) Handler
 			}
 
 			if data.IsPartial {
-				data.HtmxRedirect = fmt.Sprintf("/create-%s?id=%d&caseId=%d%s", data.CaseType, data.DonorId, data.CaseId, data.FlowQuery)
-				data.HtmxSwap = "innerHTML show:#accordion-create-epa-heading-3:top"
+				if data.CaseType == "epa" {
+					data.HtmxRedirect = fmt.Sprintf("/update-epa?id=%d&caseId=%d%s", data.DonorId, data.CaseId, data.FlowQuery)
+					data.HtmxSwap = "innerHTML show:#accordion-create-epa-heading-3:top"
+				} else {
+					data.HtmxRedirect = fmt.Sprintf("/update-lpa?id=%d&caseId=%d%s", data.DonorId, data.CaseId, data.FlowQuery)
+					data.HtmxSwap = "innerHTML show:#scroll-to-attorneys:top"
+				}
+
 				return tmpl(w, data)
 			}
 
 			if data.CaseType == "epa" {
 				return RedirectError(fmt.Sprintf("/update-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", data.DonorId, data.CaseId))
 			}
-			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#scroll-to-attorneys", data.DonorId, data.CaseId, data.FlowQuery))
+			return RedirectError(fmt.Sprintf("/update-lpa?id=%d&caseId=%d%s#scroll-to-attorneys", data.DonorId, data.CaseId, data.FlowQuery))
 		}
 
 		return tmpl(w, data)
