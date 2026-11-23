@@ -140,7 +140,7 @@ func TestPostUpdateCertificateProvider(t *testing.T) {
 		{
 			name:        "Submit",
 			htmxRequest: false,
-			redirect:    "/create-lpa?id=1&caseId=2",
+			redirect:    "/update-lpa?id=1&caseId=2",
 			fragment:    "#accordion-create-lpa-heading-3",
 		},
 		{
@@ -152,7 +152,7 @@ func TestPostUpdateCertificateProvider(t *testing.T) {
 			name:        "Submit htmx request",
 			htmxRequest: true,
 			swap:        "innerHTML show:#accordion-create-lpa-heading-3:top",
-			redirect:    "/create-lpa?id=1&caseId=2",
+			redirect:    "/update-lpa?id=1&caseId=2",
 			fragment:    "#accordion-create-lpa-heading-3",
 		},
 	}

@@ -143,7 +143,7 @@ describe("Create or Update Attorney on an LPA", () => {
     fillInAttorneyDetails("lpa");
     cy.contains("Add an attorney");
     cy.get("button[type=submit]").click();
-    cy.url().should("include", "create-lpa");
+    cy.url().should("include", "update-lpa");
   });
 
   it("creates an attorney on an LPA and add another attorney", () => {
@@ -157,7 +157,7 @@ describe("Create or Update Attorney on an LPA", () => {
     cy.get(".govuk-back-link")
       .should("exist")
       .and("have.attr", "href")
-      .and("include", "/create-lpa?id=1&caseId=2#scroll-to-attorneys");
+      .and("include", "/update-lpa?id=1&caseId=2#scroll-to-attorneys");
   });
 
   it("should show the trust corporation link on a pfa lpa", () => {
@@ -225,6 +225,6 @@ describe("Update Attorney on an LPA", () => {
 
     cy.get("#f-firstname").clear().type("Rafael");
     cy.get("button[type=submit]").click();
-    cy.url().should("include", "create-lpa");
+    cy.url().should("include", "update-lpa");
   });
 });

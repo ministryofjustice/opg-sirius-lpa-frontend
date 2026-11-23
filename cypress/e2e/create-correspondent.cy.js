@@ -90,6 +90,6 @@ describe("Create correspondent", () => {
     cy.get("label[for=f-correspondenceBy-phone]").click();
     cy.get("label[for=f-correspondenceBy-welsh]").click();
     cy.get("button[type=submit]").click();
-    cy.url().should("include", "/create-lpa");
+    cy.url().should("include", "/update-lpa");
   });
 });

@@ -15,7 +15,7 @@
 
     <a class="govuk-back-link"
        href=""
-       hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-1" .DonorId .CaseId .FlowQuery) }}"
+       hx-get="{{ prefix (printf "/update-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-1" .DonorId .CaseId .FlowQuery) }}"
        hx-target=".action-panel__content"
        hx-swap="innerHTML show:#accordion-create-lpa-heading-1:top">Back</a>
 
@@ -49,7 +49,7 @@
       {{ end }}
       <a class="govuk-link govuk-link--no-visited-state"
          href=""
-         hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-1" .DonorId .CaseId .FlowQuery) }}"
+         hx-get="{{ prefix (printf "/update-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-1" .DonorId .CaseId .FlowQuery) }}"
          hx-target=".action-panel__content"
          hx-swap="innerHTML show:#accordion-create-lpa-heading-1:top">Cancel</a>
     </div>
@@ -64,7 +64,7 @@
     <div class="govuk-grid-column-two-thirds">
       {{ template "error-summary" .Error }}
 
-      <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-1" .DonorId .CaseId .FlowQuery) }}" class="govuk-back-link">Back</a>
+      <a href="{{ prefix (printf "/update-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-1" .DonorId .CaseId .FlowQuery) }}" class="govuk-back-link">Back</a>
 
       <h1 class="govuk-heading-l">{{ .Title }}</h1>
 
@@ -88,7 +88,7 @@
           {{ if ne .NextAttorneyId 0 }}
             <input class="govuk-button" data-module="govuk-button" type="submit" name="update-next-attorney" value="Save and update next replacement attorney" />
           {{ end }}
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-1" .DonorId .CaseId .FlowQuery) }}">Cancel</a>
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/update-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-1" .DonorId .CaseId .FlowQuery) }}">Cancel</a>
         </div>
       </form>
     </div>

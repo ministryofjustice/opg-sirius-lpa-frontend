@@ -149,13 +149,13 @@ func TestPostUpdateCorrespondent(t *testing.T) {
 		{
 			name:     "LPA without flow",
 			caseType: "lpa",
-			redirect: "/create-lpa?id=1&caseId=2#scroll-to-correspondent",
+			redirect: "/update-lpa?id=1&caseId=2#scroll-to-correspondent",
 		},
 		{
 			name:      "LPA create flow",
 			caseType:  "lpa",
 			flowQuery: "&flow=create",
-			redirect:  "/create-lpa?id=1&caseId=2&flow=create#scroll-to-correspondent",
+			redirect:  "/update-lpa?id=1&caseId=2&flow=create#scroll-to-correspondent",
 		},
 	}
 
