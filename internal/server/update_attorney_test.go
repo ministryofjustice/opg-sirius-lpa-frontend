@@ -368,7 +368,7 @@ func TestPostUpdateLpaAttorneyNextActor(t *testing.T) {
 				redirect string
 			}{
 				{name: "Attorney", redirect: "/update-attorney?id=1&caseId=2&caseType=lpa&attorneyId=3"},
-				{name: "Trust Corporation", redirect: "/create-trust-corporation?id=1&caseId=2&trustCorporationId=3&replacement=false"},
+				{name: "Trust Corporation", redirect: "/update-trust-corporation?id=1&caseId=2&trustCorporationId=3&replacement=false"},
 			} {
 				t.Run(nextActor.name, func(t *testing.T) {
 					for _, isHtmx := range []bool{false, true} {

@@ -133,7 +133,7 @@ func UpdateAttorney(client UpdateAttorneyClient, tmpl template.Template) Handler
 			if r.FormValue("update-next-attorney") != "" {
 				redirect := fmt.Sprintf("/update-attorney?id=%d&caseId=%d&caseType=%s&attorneyId=%d%s", data.DonorId, data.CaseId, data.CaseType, data.NextAttorneyId, data.FlowQuery)
 				if nextPersonType == "Trust Corporation" {
-					redirect = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=false%s", data.DonorId, data.CaseId, data.NextAttorneyId, data.FlowQuery)
+					redirect = fmt.Sprintf("/update-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=false%s", data.DonorId, data.CaseId, data.NextAttorneyId, data.FlowQuery)
 				}
 
 				if data.IsPartial {
