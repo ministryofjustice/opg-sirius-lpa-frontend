@@ -62,6 +62,7 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 				DonorID:       pageVars.DonorID,
 				SelectedCases: pageVars.SelectedCases,
 				XSRFToken:     ctx.XSRFToken,
+				Pane:          1,
 			},
 			DocListPane2Data: documentPageData{
 				Comparing:     true,
@@ -69,6 +70,7 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 				DonorID:       pageVars.DonorID,
 				SelectedCases: pageVars.SelectedCases,
 				XSRFToken:     ctx.XSRFToken,
+				Pane:          2,
 			},
 			DonorID:                        pageVars.DonorID,
 			HasV1PersonsCasesGetPermission: pageVars.HasV1PersonsCasesGetPermission,

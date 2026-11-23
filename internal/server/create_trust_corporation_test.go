@@ -110,7 +110,7 @@ func TestPostCreateTrustCorporationTransitions(t *testing.T) {
 	}{
 		{
 			name:         "Save attorney and return to LPA",
-			redirect:     "/create-lpa?id=1&caseId=2",
+			redirect:     "/update-lpa?id=1&caseId=2",
 			fragment:     "#scroll-to-attorneys-corporation",
 			attorneyType: "Attorney",
 			systemStatus: shared.BoolPtr(true),
@@ -118,7 +118,7 @@ func TestPostCreateTrustCorporationTransitions(t *testing.T) {
 		{
 			name:                  "Save replacement attorney and return to LPA",
 			isReplacementAttorney: true,
-			redirect:              "/create-lpa?id=1&caseId=2",
+			redirect:              "/update-lpa?id=1&caseId=2",
 			fragment:              "#scroll-to-attorneys-corporation",
 			attorneyType:          "Replacement Attorney",
 			systemStatus:          shared.BoolPtr(false),

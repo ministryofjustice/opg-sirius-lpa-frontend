@@ -110,11 +110,11 @@ func UpdateNotifiedPerson(client UpdateNotifiedPersonClient, tmpl template.Templ
 			}
 
 			if data.IsPartial {
-				data.HtmxRedirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s", donorId, caseId, data.FlowQuery)
+				data.HtmxRedirect = fmt.Sprintf("/update-lpa?id=%d&caseId=%d%s", donorId, caseId, data.FlowQuery)
 				data.HtmxSwap = "innerHTML show:#scroll-to-notified-person:top"
 				return tmpl(w, data)
 			}
-			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#scroll-to-notified-person", donorId, caseId, data.FlowQuery))
+			return RedirectError(fmt.Sprintf("/update-lpa?id=%d&caseId=%d%s#scroll-to-notified-person", donorId, caseId, data.FlowQuery))
 
 		}
 

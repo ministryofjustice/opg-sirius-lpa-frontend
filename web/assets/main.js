@@ -30,6 +30,7 @@ import clearPaymentValue from "./clear-payment-value.js";
 import autoCheckSingleAttorneyApplicant from "./auto-check-single-attorney-applicant.js";
 import clearBlankSections from "./clear-blank-sections";
 import fillCorrespondentDetails from "./fill-correspondent-details.js";
+import dateInputToText from "./date-input-to-text";
 
 const prefix = document.body.getAttribute("data-prefix");
 
@@ -62,6 +63,7 @@ clearPaymentValue();
 autoCheckSingleAttorneyApplicant();
 clearBlankSections();
 fillCorrespondentDetails();
+dateInputToText();
 
 globalThis.htmx = htmx;
 // Don't include indicator styles as CSP blocks inline styles
@@ -102,6 +104,8 @@ htmx.on("htmx:afterSettle", (event) => {
     clearBlankSections(swapDetails.target);
     initSiriusHeader();
     showHideFilter(swapDetails.target);
+    dateInputToText(swapDetails.target);
+    documentListSort(swapDetails.target);
 
     // Update the action panel width if swapping in create-document or edit-document content
     if (swapDetails.target.id === "actions-content") {

@@ -226,6 +226,7 @@ func TestGetCompareDocsPanes(t *testing.T) {
 					CompareURLs:   tc.compareURLs1,
 					CloseURL:      tc.closeURLToDocumentPanel1,
 					DonorID:       77,
+					Pane:          1,
 				},
 				DocListPane2Data: documentPageData{
 					DocumentList:  documentList,
@@ -234,6 +235,7 @@ func TestGetCompareDocsPanes(t *testing.T) {
 					CompareURLs:   tc.compareURLs2,
 					CloseURL:      tc.closeURLToDocumentPanel2,
 					DonorID:       77,
+					Pane:          2,
 				},
 				Pane1:                          tc.pane1,
 				Pane2:                          tc.pane2,
