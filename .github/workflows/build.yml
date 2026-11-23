@@ -147,6 +147,20 @@ jobs:
         with:
           sarif_file: test-results/golangci-lint.sarif
 
+  gosec:
+    name: Go Sec
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Go Sec
+        run: make gosec
+      - name: Upload GoSec results to GitHub Security tab
+        if: ${{ always() }}
+        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+        with:
+          sarif_file: test-results/gosec.sarif
+          category: gosec
+
   acceptance-test:
     name: Acceptance Testing
     runs-on: ubuntu-latest
@@ -230,6 +244,7 @@ jobs:
         "build",
         "test",
         "lint",
+        "gosec",
         "acceptance-test",
         "cypress",
       ]
@@ -306,6 +321,7 @@ jobs:
         "build",
         "test",
         "lint",
+        "gosec",
         "acceptance-test",
         "cypress",
         "push",
