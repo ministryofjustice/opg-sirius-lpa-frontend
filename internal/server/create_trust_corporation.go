@@ -117,7 +117,7 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 				}
 			}
 
-			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#scroll-to-attorneys-corporation", donorId, caseId, data.FlowQuery))
+			return RedirectError(fmt.Sprintf("/update-lpa?id=%d&caseId=%d%s#scroll-to-attorneys-corporation", donorId, caseId, data.FlowQuery))
 		}
 
 		return tmpl(w, data)
