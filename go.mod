@@ -36,7 +36,6 @@ require (
 	github.com/coder/websocket v1.8.15 // indirect
 	github.com/cosiner/argv v0.1.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.6 // indirect
-	github.com/creack/pty v1.1.24 // indirect
 	github.com/derekparker/trie/v3 v3.2.0 // indirect
 	github.com/dnephin/pflag v1.0.7 // indirect
 	github.com/fatih/color v1.18.0 // indirect
