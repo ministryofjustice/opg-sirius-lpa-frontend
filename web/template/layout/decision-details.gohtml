@@ -42,7 +42,7 @@
                         {{ range .DecisionAttorneys}}
                         <div class="govuk-body">
                             {{ .FirstNames }} {{ .LastName }} {{ if eq .AppointmentType "replacement"}}(previously a replacement attorney){{ end }}
-                            <br>Date of birth: {{ parseAndFormatDate .DateOfBirth "2006-01-02" "2 January 2006" }}
+                            <br>Date of birth: {{ parseAndFormatDate .DateOfBirth "2006-01-02" "02/01/2006" }}
                         </div>
                         {{ end }}
                     </dd>

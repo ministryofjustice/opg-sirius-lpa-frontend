@@ -31,7 +31,7 @@
                 <dt class="govuk-summary-list__key">Date of birth</dt>
                 <dd class="govuk-summary-list__value">
                   {{ if not (eq .RemovedAttorneysDetails.SelectedAttorneyDob "") }}
-                    {{ parseAndFormatDate .RemovedAttorneysDetails.SelectedAttorneyDob "2006-01-02" "2 January 2006" }}
+                    {{ parseAndFormatDate .RemovedAttorneysDetails.SelectedAttorneyDob "2006-01-02" "02/01/2006" }}
                   {{ end }}
                 </dd>
               </div>
@@ -67,7 +67,7 @@
                     <dt class="govuk-summary-list__key">Date of birth</dt>
                     <dd class="govuk-summary-list__value">
                       {{ if not (eq $enabledAttorney.SelectedAttorneyDob "") }}
-                        {{ parseAndFormatDate $enabledAttorney.SelectedAttorneyDob "2006-01-02" "2 January 2006" }}
+                        {{ parseAndFormatDate $enabledAttorney.SelectedAttorneyDob "2006-01-02" "02/01/2006" }}
                       {{ end }}
                     </dd>
                   </div>
@@ -106,7 +106,7 @@
                     <dt class="govuk-summary-list__key">Date of birth</dt>
                     <dd class="govuk-summary-list__value">
                       {{ if not (eq $decisionAttorney.AttorneyDob "") }}
-                        {{ parseAndFormatDate $decisionAttorney.AttorneyDob "2006-01-02" "2 January 2006" }}
+                        {{ parseAndFormatDate $decisionAttorney.AttorneyDob "2006-01-02" "02/01/2006" }}
                       {{ end }}
                     </dd>
                   </div>
