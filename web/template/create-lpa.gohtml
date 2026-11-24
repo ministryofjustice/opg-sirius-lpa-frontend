@@ -2,18 +2,9 @@
 
 {{ define "partial-content" }}
   <div class="action-panel__form">
-    {{ if .HtmxRedirect }}
-      <span class="govuk-!-display-none"
-            hx-get="{{ prefix .HtmxRedirect }}"
-            hx-target=".action-panel__content"
-            hx-swap="{{ .HtmxSwap }}"
-            hx-trigger="load"
-      ></span>
-    {{ end }}
-
     {{ template "error-summary" .Error }}
 
-    {{ if and .Success (not .HtmxRedirect) }}
+    {{ if and .Success }}
       <meta http-equiv="Refresh" content="0" />
       {{ template "success-banner" .SuccessMessage }}
     {{ end }}
@@ -24,7 +15,7 @@
 
     <form class="form"
           method="POST"
-          hx-post="{{ if .IsUpdate }}{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s" .DonorId .CaseId .FlowQuery) }}{{ else }}{{ prefix (printf "/create-lpa?id=%d%s" .DonorId .FlowQuery) }}{{ end }}"
+          hx-post="{{ if .IsUpdate }}{{ prefix (printf "/update-lpa?id=%d&caseId=%d%s" .DonorId .CaseId .FlowQuery) }}{{ else }}{{ prefix (printf "/create-lpa?id=%d%s" .DonorId .FlowQuery) }}{{ end }}"
           hx-target=".action-panel__content"
           hx-swap="innerHTML scroll:.action-panel__content:top"
     >
@@ -511,7 +502,7 @@
                 {{ if eq .PersonType "Trust Corporation" }}
                   {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) .CompanyName .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
                 {{ else }}
-                  {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) (printf "%s %s" .Firstname .Surname) .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
+                  {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) (printf "%s %s %s" .Firstname .Middlenames .Surname) .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
                 {{ end }}
               {{ end }}
             {{ end }}
@@ -523,7 +514,7 @@
                 {{ if eq .PersonType "Trust Corporation" }}
                   {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) .CompanyName .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
                 {{ else }}
-                  {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) (printf "%s %s" .Firstname .Surname) .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
+                  {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) (printf "%s %s %s" .Firstname .Middlenames .Surname) .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
                 {{ end }}
               {{ end }}
             {{ end }}

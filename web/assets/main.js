@@ -104,6 +104,7 @@ htmx.on("htmx:afterSettle", (event) => {
     clearBlankSections(swapDetails.target);
     initSiriusHeader();
     showHideFilter(swapDetails.target);
+    fillCorrespondentDetails();
     dateInputToText(swapDetails.target);
     documentListSort(swapDetails.target);
 

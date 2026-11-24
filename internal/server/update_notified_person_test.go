@@ -138,12 +138,12 @@ func TestPostUpdateNotifiedPersonTransitions(t *testing.T) {
 	}{
 		{
 			name:        "Submit",
-			expectedErr: RedirectError("/create-lpa?id=1&caseId=2#scroll-to-notified-person"),
+			expectedErr: RedirectError("/update-lpa?id=1&caseId=2#scroll-to-notified-person"),
 		},
 		{
 			name:        "Submit with create flow",
 			flowQuery:   "&flow=create",
-			expectedErr: RedirectError("/create-lpa?id=1&caseId=2&flow=create#scroll-to-notified-person"),
+			expectedErr: RedirectError("/update-lpa?id=1&caseId=2&flow=create#scroll-to-notified-person"),
 		},
 		{
 			name:        "Submit API Failure",
@@ -153,14 +153,14 @@ func TestPostUpdateNotifiedPersonTransitions(t *testing.T) {
 		{
 			name:         "Submit htmx request",
 			htmxRequest:  true,
-			htmxRedirect: "/create-lpa?id=1&caseId=2",
+			htmxRedirect: "/update-lpa?id=1&caseId=2",
 			htmxSwap:     "innerHTML show:#scroll-to-notified-person:top",
 		},
 		{
 			name:         "Submit htmx request with create flow",
 			flowQuery:    "&flow=create",
 			htmxRequest:  true,
-			htmxRedirect: "/create-lpa?id=1&caseId=2&flow=create",
+			htmxRedirect: "/update-lpa?id=1&caseId=2&flow=create",
 			htmxSwap:     "innerHTML show:#scroll-to-notified-person:top",
 		},
 		{

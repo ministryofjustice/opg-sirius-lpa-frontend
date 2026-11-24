@@ -90,6 +90,7 @@ type Client interface {
 	UpdateDonorClient
 	UpdateFeeReductionClient
 	UpdateInvestigationClient
+	UpdateLpaClient
 	UpdatePaymentClient
 	UpdateTrustCorporationClient
 	EventClient
@@ -198,6 +199,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/update-decline-fee-reduction", wrap(UpdateFeeDecision(client, templates.Get("decline-fee-reduction.gohtml"))))
 	mux.Handle("/create-investigation", wrap(CreateInvestigation(client, templates.Get("create-investigation.gohtml"))))
 	mux.Handle("/create-lpa", wrap(CreateLpa(client, templates.Get("create-lpa.gohtml"))))
+	mux.Handle("/update-lpa", wrap(UpdateLpa(client, templates.Get("create-lpa.gohtml"))))
 	mux.Handle("/create-relationship", wrap(Relationship(client, templates.Get("create-relationship.gohtml"))))
 	mux.Handle("/create-notified-person", wrap(CreateNotifiedPerson(client, templates.Get("create-notified-person.gohtml"))))
 	mux.Handle("/create-replacement-attorney", wrap(CreateReplacementAttorney(client, templates.Get("replacement-attorney.gohtml"))))
