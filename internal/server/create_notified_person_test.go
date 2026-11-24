@@ -123,9 +123,9 @@ func TestPostCreateNotifiedPersonTransitions(t *testing.T) {
 	}{
 		{
 			name:         "Save and return to LPA",
-			redirect:     "/create-lpa?id=1&caseId=2",
+			redirect:     "/update-lpa?id=1&caseId=2",
 			fragment:     "#scroll-to-notified-person",
-			htmxRedirect: "/create-lpa?id=1&caseId=2",
+			htmxRedirect: "/update-lpa?id=1&caseId=2",
 			htmxSwap:     "innerHTML show:#scroll-to-notified-person:top",
 		},
 		{

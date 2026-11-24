@@ -561,7 +561,7 @@ func TestGetDocumentList(t *testing.T) {
 				},
 				{
 					Label:    "Edit case",
-					URL:      "/create-lpa?id=82&caseId=1",
+					URL:      "/update-lpa?id=82&caseId=1",
 					IconName: "aw-edit-case",
 					Disabled: false,
 					Hidden:   true,
@@ -729,7 +729,7 @@ func TestGetDocumentList(t *testing.T) {
 				},
 				{
 					Label:    "Edit case",
-					URL:      "/create-lpa?id=82&caseId=1",
+					URL:      "/update-lpa?id=82&caseId=1",
 					IconName: "aw-edit-case",
 					Disabled: false,
 					Hidden:   true,
@@ -965,6 +965,7 @@ func TestGetDocumentList(t *testing.T) {
 						HasV1PersonsGetPermission: tc.hasV1PersonsGetPermission,
 						SelectedCaseIds:           tc.selectedCaseIds,
 						HeaderButtons:             headerButtons,
+						Pane:                      1,
 					},
 				).
 				Return(nil)
@@ -1135,6 +1136,7 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 					Detail: "Select one or more documents and try again.",
 				},
 				HasV1PersonsGetPermission: false,
+				Pane:                      1,
 				ActionPanelButtons: []ActionPanelButton{
 					{
 						Label:    "Create warning",
@@ -1375,6 +1377,7 @@ func TestDocumentListDismissValidation(t *testing.T) {
 				DonorID:                   82,
 				CaseUids:                  "&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 				HasV1PersonsGetPermission: false,
+				Pane:                      1,
 				ActionPanelButtons: []ActionPanelButton{
 					{
 						Label:    "Create warning",
@@ -1790,6 +1793,7 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 				MultipleCasesSelected:     false,
 				DonorID:                   82,
 				HasV1PersonsGetPermission: false,
+				Pane:                      1,
 				ActionPanelButtons: []ActionPanelButton{
 					{
 						Label:    "Create warning",
@@ -1933,7 +1937,7 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 					},
 					{
 						Label:    "Edit case",
-						URL:      "/create-lpa?id=82&caseId=1",
+						URL:      "/update-lpa?id=82&caseId=1",
 						IconName: "aw-edit-case",
 						Disabled: false,
 						Hidden:   true,
@@ -2147,6 +2151,7 @@ func TestDocumentListDownloadMultipleInfectedError(t *testing.T) {
 					Detail: "One or more of the following documents could not be downloaded due to being infected.",
 				},
 				HasV1PersonsGetPermission: false,
+				Pane:                      1,
 				ActionPanelButtons: []ActionPanelButton{
 					{
 						Label:    "Create warning",

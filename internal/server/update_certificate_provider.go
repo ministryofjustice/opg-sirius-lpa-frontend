@@ -72,7 +72,7 @@ func UpdateCertificateProvider(client UpdateCertificateProviderClient, tmpl temp
 			} else if err != nil {
 				return err
 			} else {
-				redirect := fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-3", donorId, caseId, data.FlowQuery)
+				redirect := fmt.Sprintf("/update-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-3", donorId, caseId, data.FlowQuery)
 
 				if data.IsPartial {
 					data.HtmxRedirect = redirect

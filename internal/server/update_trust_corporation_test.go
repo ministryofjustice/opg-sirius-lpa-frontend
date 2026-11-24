@@ -112,7 +112,7 @@ func TestPostEditTrustCorporationTransitions(t *testing.T) {
 			lpa: sirius.Lpa{Case: sirius.Case{TrustCorporations: []sirius.TrustCorporation{
 				{Attorney: sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}}},
 			}}},
-			redirect: "/create-lpa?id=1&caseId=2",
+			redirect: "/update-lpa?id=1&caseId=2",
 			fragment: "#scroll-to-attorneys-corporation",
 		},
 		{
@@ -147,7 +147,7 @@ func TestPostEditTrustCorporationTransitions(t *testing.T) {
 			name:     "Update next with no following actor",
 			formKey:  "update-next-attorney",
 			lpa:      sirius.Lpa{Case: sirius.Case{TrustCorporations: []sirius.TrustCorporation{{Attorney: sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}}}}}},
-			redirect: "/create-lpa?id=1&caseId=2",
+			redirect: "/update-lpa?id=1&caseId=2",
 			fragment: "#scroll-to-attorneys-corporation",
 		},
 	}

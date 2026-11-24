@@ -94,7 +94,7 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 				if data.CaseType == "epa" {
 					return RedirectError(fmt.Sprintf("/update-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
 				} else {
-					return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#scroll-to-correspondent", donorId, caseId, data.FlowQuery))
+					return RedirectError(fmt.Sprintf("/update-lpa?id=%d&caseId=%d%s#scroll-to-correspondent", donorId, caseId, data.FlowQuery))
 				}
 			}
 

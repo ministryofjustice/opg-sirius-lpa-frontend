@@ -107,11 +107,11 @@ func UpdateReplacementAttorney(client UpdateReplacementAttorneyClient, tmpl temp
 			}
 
 			if ctx.IsPartial {
-				data.HtmxRedirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s", donorId, caseId, data.FlowQuery)
+				data.HtmxRedirect = fmt.Sprintf("/update-lpa?id=%d&caseId=%d%s", donorId, caseId, data.FlowQuery)
 				data.HtmxSwap = "innerHTML show:#scroll-to-replacement-attorneys:top"
 				return tmpl(w, data)
 			}
-			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#scroll-to-replacement-attorneys", donorId, caseId, data.FlowQuery))
+			return RedirectError(fmt.Sprintf("/update-lpa?id=%d&caseId=%d%s#scroll-to-replacement-attorneys", donorId, caseId, data.FlowQuery))
 		}
 
 		return tmpl(w, data)
