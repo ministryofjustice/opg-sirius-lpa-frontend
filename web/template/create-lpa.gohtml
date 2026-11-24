@@ -502,7 +502,7 @@
                 {{ if eq .PersonType "Trust Corporation" }}
                   {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) .CompanyName .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
                 {{ else }}
-                  {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) (printf "%s %s" .Firstname .Surname) .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
+                  {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) (printf "%s %s %s" .Firstname .Middlenames .Surname) .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
                 {{ end }}
               {{ end }}
             {{ end }}
@@ -514,7 +514,7 @@
                 {{ if eq .PersonType "Trust Corporation" }}
                   {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) .CompanyName .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
                 {{ else }}
-                  {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) (printf "%s %s" .Firstname .Surname) .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
+                  {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) (printf "%s %s %s" .Firstname .Middlenames .Surname) .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
                 {{ end }}
               {{ end }}
             {{ end }}
