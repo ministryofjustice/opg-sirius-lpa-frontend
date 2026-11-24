@@ -237,4 +237,19 @@ $color-dark-bg-grey: #363639;
   .moj-alert__content--multiline {
     white-space: pre-line;
   }
+
+  .govuk-table[data-module="moj-sortable-table"] {
+    [aria-sort] button {
+      color: govuk-colour("white");
+    }
+
+    [aria-sort="none"] button svg {
+      color: govuk-colour("black", $variant: "tint-50");
+    }
+
+    [aria-sort] button:focus,
+    [aria-sort] button:focus svg {
+      color: govuk-colour("black");
+    }
+  }
 }
