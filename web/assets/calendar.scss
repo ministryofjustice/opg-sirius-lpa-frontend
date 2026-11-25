@@ -10,10 +10,6 @@ $calendar-row-height: 2rem;
 $calendar-max-weeks: 6;
 $calendar-month-name-width: 9.5rem;
 
-.sirius-header__dropdown-panel:has(.panel-calendar) {
-  background: $calendar-panel-blue;
-}
-
 .panel-calendar {
   padding: 15px 25px;
   height: auto;
