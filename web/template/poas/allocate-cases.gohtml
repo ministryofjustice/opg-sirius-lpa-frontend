@@ -114,6 +114,13 @@
                 <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-assignTo-2">
                     {{ template "select" (select "assigneeTeam" "Team" nil .Error.Field.assigneeTeam (options .Teams)) }}
                 </div>
+
+                <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-assignTo-3" name="assignTo" type="radio" value="me" {{ if eq "me" .AssignTo }}checked{{ end }}>
+                    <label class="govuk-label govuk-radios__label" for="f-assignTo-3">
+                        Me
+                    </label>
+                </div>
             </div>
         </fieldset>
     </div>
