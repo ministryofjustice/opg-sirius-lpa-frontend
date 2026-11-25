@@ -32,6 +32,11 @@ func (m *mockAllocateCasesClient) Case(ctx sirius.Context, id int) (sirius.Case,
 	return args.Get(0).(sirius.Case), args.Error(1)
 }
 
+func (m *mockAllocateCasesClient) GetUserDetails(ctx sirius.Context) (sirius.User, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(sirius.User), args.Error(1)
+}
+
 func TestGetAllocateCases(t *testing.T) {
 	client := &mockAllocateCasesClient{}
 	client.
@@ -264,6 +269,75 @@ func TestPostAllocateCases(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostAllocateCasesToMe(t *testing.T) {
+	user := sirius.User{ID: 66}
+
+	client := &mockAllocateCasesClient{}
+	client.
+		On("Teams", mock.Anything).
+		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
+	client.
+		On("Case", mock.Anything, 123).
+		Return(sirius.Case{UID: "7000-0000-0000", CaseType: "LPA"}, nil)
+	client.
+		On("AllocateCases", mock.Anything, 66, []sirius.CaseAllocation{{ID: 123, CaseType: "LPA"}}).
+		Return(nil)
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(user, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, allocateCasesData{
+			Success:  true,
+			Teams:    []sirius.Team{{ID: 1, DisplayName: "A Team"}},
+			Entities: []string{"LPA 7000-0000-0000"},
+			CaseID:   123,
+			CaseIDs:  []int{123},
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"assignTo": {"me"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := AllocateCases(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostAllocateCasesWhenUserDetailsErrors(t *testing.T) {
+	client := &mockAllocateCasesClient{}
+	client.
+		On("Teams", mock.Anything).
+		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
+	client.
+		On("Case", mock.Anything, 123).
+		Return(sirius.Case{UID: "7000-0000-0000", CaseType: "LPA"}, nil)
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{}, errExample)
+
+	form := url.Values{
+		"assignTo": {"me"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := AllocateCases(client, nil)(w, r)
+
+	assert.Equal(t, errExample, err)
 }
 
 func TestPostAllocateCasesMultiple(t *testing.T) {

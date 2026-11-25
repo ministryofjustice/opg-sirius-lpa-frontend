@@ -14,6 +14,7 @@ import (
 type AllocateCasesClient interface {
 	AllocateCases(ctx sirius.Context, assigneeID int, allocations []sirius.CaseAllocation) error
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
+	GetUserDetails(ctx sirius.Context) (sirius.User, error)
 	Teams(ctx sirius.Context) ([]sirius.Team, error)
 }
 
@@ -120,6 +121,13 @@ func AllocateCases(client AllocateCasesClient, tmpl template.Template) Handler {
 			assignTo := postFormString(r, "assignTo")
 
 			switch assignTo {
+			case "me":
+				user, err := client.GetUserDetails(ctx)
+				if err != nil {
+					return err
+				}
+				assigneeID = user.ID
+
 			case "user":
 				parts := strings.SplitN(postFormString(r, "assigneeUser"), ":", 2)
 				if len(parts) == 2 {
