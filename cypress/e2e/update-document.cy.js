@@ -31,6 +31,16 @@ describe("Edit a document", () => {
         id: 800,
         caseType: "LPA",
         donor: { id: 33 },
+        attorneys: [
+          { id: 1, systemStatus: true },
+          { id: 2, systemStatus: false },
+        ],
+        replacementAttorneys: [{ id: 3 }],
+        trustCorporations: [
+          { id: 4, systemStatus: true },
+          { id: 4, systemStatus: false },
+          { id: 4, systemStatus: false, isReplacementAttorney: true },
+        ],
       },
     });
     cy.addMock("/lpa-api/v1/lpas/800/documents?type[]=Draft", "GET", {
@@ -200,5 +210,17 @@ describe("Edit a document", () => {
     cy.get("#documentTextEditor").contains("Test content");
 
     cy.contains("button", "Publish draft").click();
+  });
+
+  it("preselects the section 11 count that is equal to the number of attorneys when sections 10+11 are selected", () => {
+    cy.get("#insert-blank-sections").check();
+    cy.get("#f-blankSections-2").check();
+    cy.get("#f-section11Count2-4").should("be.checked");
+  });
+
+  it("preselects the section 11 count that is equal to the number of attorneys when sections 10+11+15 are selected", () => {
+    cy.get("#insert-blank-sections").check();
+    cy.get("#f-blankSections-2").check();
+    cy.get("#f-section11Count4-4").should("be.checked");
   });
 });
