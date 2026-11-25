@@ -31,6 +31,7 @@ import autoCheckSingleAttorneyApplicant from "./auto-check-single-attorney-appli
 import clearBlankSections from "./clear-blank-sections";
 import fillCorrespondentDetails from "./fill-correspondent-details.js";
 import dateInputToText from "./date-input-to-text";
+import closeDatePickerOnZoom from "./close-date-picker-on-zoom.js";
 
 const prefix = document.body.getAttribute("data-prefix");
 
@@ -64,6 +65,7 @@ autoCheckSingleAttorneyApplicant();
 clearBlankSections();
 fillCorrespondentDetails();
 dateInputToText();
+closeDatePickerOnZoom();
 
 globalThis.htmx = htmx;
 // Don't include indicator styles as CSP blocks inline styles
@@ -107,6 +109,7 @@ htmx.on("htmx:afterSettle", (event) => {
     fillCorrespondentDetails();
     dateInputToText(swapDetails.target);
     documentListSort(swapDetails.target);
+    closeDatePickerOnZoom(swapDetails.target);
 
     // Update the action panel width if swapping in create-document or edit-document content
     if (swapDetails.target.id === "actions-content") {
