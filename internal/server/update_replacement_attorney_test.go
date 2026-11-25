@@ -97,7 +97,7 @@ func TestPostUpdateReplacementAttorneyTransitions(t *testing.T) {
 	}{
 		{
 			name:     "Save and return to LPA",
-			redirect: "/create-lpa?id=1&caseId=2",
+			redirect: "/update-lpa?id=1&caseId=2",
 			fragment: "#scroll-to-replacement-attorneys",
 			htmxSwap: "innerHTML show:#scroll-to-replacement-attorneys:top",
 			lpa: sirius.Lpa{Case: sirius.Case{

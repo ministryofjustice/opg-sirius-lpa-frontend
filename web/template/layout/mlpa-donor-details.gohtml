@@ -53,7 +53,7 @@
                     <dt class="govuk-summary-list__key">Date of birth</dt>
                     <dd class="govuk-summary-list__value">
                         {{ if and (not .DigitalLpa.SiriusData.Application.DonorIdentityCheckWhenDraft) (not (eq .DigitalLpa.LpaStoreData.Donor.DateOfBirth "")) }}
-                            {{ parseAndFormatDate .DigitalLpa.LpaStoreData.Donor.DateOfBirth "2006-01-02" "2 January 2006" }}
+                            {{ parseAndFormatDate .DigitalLpa.LpaStoreData.Donor.DateOfBirth "2006-01-02" "02/01/2006" }}
                         {{ else if and (.DigitalLpa.SiriusData.Application.DonorIdentityCheckWhenDraft) (not (eq .DigitalLpa.SiriusData.Application.DonorDob "")) }}
                             {{ (date .DigitalLpa.SiriusData.Application.DonorDob "2 January 2006") }}
                         {{ end }}

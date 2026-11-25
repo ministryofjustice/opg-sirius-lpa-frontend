@@ -39,7 +39,7 @@ describe("Create certificate provider form", () => {
       .and("have.attr", "href")
       .and(
         "include",
-        "/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-3",
+        "/update-lpa?id=1&caseId=2#accordion-create-lpa-heading-3",
       );
   });
 });

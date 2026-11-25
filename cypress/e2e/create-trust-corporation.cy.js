@@ -26,6 +26,6 @@ describe("Create trust corporation form", () => {
     cy.get("#f-phoneNumber").type("345");
     cy.get("#f-email").type("test@test.com");
     cy.get("button[type=submit]").click();
-    cy.url().should("include", "create-lpa");
+    cy.url().should("include", "update-lpa");
   });
 });
