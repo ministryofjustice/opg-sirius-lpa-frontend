@@ -160,6 +160,66 @@ describe("Person info panel on the header bar", () => {
     });
   });
 
+  it("scrolls the people list independently of the details", () => {
+    cy.viewport(1000, 660);
+    cy.visit("/sirius-header-people-info?id=123");
+
+    cy.document().then((document) => {
+      const stylesheet = document.createElement("link");
+      stylesheet.rel = "stylesheet";
+      stylesheet.href = "/stylesheets/all.css";
+      document.head.appendChild(stylesheet);
+
+      const personInfo = document.querySelector(".app-person-info");
+      const people = personInfo.querySelector(".app-person-info__people tbody");
+      for (let i = 0; i < 4; i++) {
+        people.appendChild(people.lastElementChild.cloneNode(true));
+      }
+      const panel = document.createElement("div");
+      panel.className = "sirius-header__dropdown-panel";
+      panel.innerHTML =
+        '<div class="govuk-width-container"><div class="sirius-header__dropdown"></div></div>';
+      personInfo.replaceWith(panel);
+      panel.querySelector(".sirius-header__dropdown").appendChild(personInfo);
+    });
+
+    cy.get(".sirius-header__dropdown-panel").should(
+      "have.css",
+      "position",
+      "fixed",
+    );
+    cy.get(".app-person-info").should("have.css", "padding-bottom", "0px");
+    cy.get(".app-person-info__details").should(($details) => {
+      expect($details.find(".govuk-summary-list__row")).to.have.length(6);
+      expect($details[0].scrollHeight).to.equal($details[0].clientHeight);
+    });
+    cy.get(".app-person-info__details").then(($details) => {
+      const top = $details[0].getBoundingClientRect().top;
+
+      cy.get(".app-person-info__people")
+        .scrollTo("bottom")
+        .its("0.scrollTop")
+        .should("be.gt", 0);
+      cy.get(".app-person-info__details").should(($element) => {
+        expect($element[0].getBoundingClientRect().top).to.equal(top);
+      });
+      cy.get(".sirius-header__dropdown-panel")
+        .its("0.scrollTop")
+        .should("equal", 0);
+    });
+
+    cy.get(".app-person-info__details .govuk-summary-list").then(($list) => {
+      const row = $list[0].lastElementChild;
+      for (let i = 0; i < 10; i++) {
+        $list[0].appendChild(row.cloneNode(true));
+      }
+    });
+    cy.get(".app-person-info__details")
+      .scrollTo("bottom")
+      .its("0.scrollTop")
+      .should("be.gt", 0);
+  });
+
   it("shows the selected person's details with empty rows still labelled", () => {
     cy.visit("/sirius-header-people-info?id=123&selected=2");
 

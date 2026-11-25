@@ -57,7 +57,7 @@
             {{ $person := .SelectedPerson }}
             {{ $selectedLabel := "" }}{{ with $selected }}{{ $selectedLabel = .Label }}{{ end }}
             {{ $showDateOfBirth := not (or (eq $selectedLabel "Certificate provider") (eq $selectedLabel "Correspondent")) }}
-            <div class="app-person-info__details">
+            <div class="app-person-info__details" tabindex="0" role="region" aria-label="Selected person's details">
                 {{ with $selected }}
                     <h3 class="app-person-info__details-heading">{{ template "person-label" . }}: {{ template "person-name" .Person }}</h3>
                 {{ end }}
