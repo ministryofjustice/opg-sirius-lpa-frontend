@@ -75,7 +75,7 @@
           <dt class="govuk-summary-list__key">Appointment type</dt>
           <dd class="govuk-summary-list__value">
             {{ if compareBoolPointers .Case.CaseAttorneySingular true }}
-              Singular
+              One attorney appointed
             {{ else if compareBoolPointers .Case.CaseAttorneyJointly true }}
               Jointly
             {{ else if compareBoolPointers .Case.CaseAttorneyJointlyAndSeverally true }}
