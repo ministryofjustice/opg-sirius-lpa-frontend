@@ -20,6 +20,7 @@ npm-prettier:
 	docker compose run --rm npm run prettier . --write
 
 gosec: ## Scan Go code for security flaws
+gosec: setup-directories
 	docker compose run --rm gosec
 
 test-results:
