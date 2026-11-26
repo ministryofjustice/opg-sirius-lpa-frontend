@@ -233,7 +233,7 @@
                                                         {{ $count := plusN . 1 }}
                                                         <div class="govuk-radios__item">
                                                             <input class="govuk-radios__input" id="f-section11Count2-{{$count}}" name="section11Count2" type="radio"
-                                                                   value="{{$count}}"{{if or (eq $.Section11Count2 (printf "%d" $count)) (eq $.AttorneyCount 1)}} checked{{end}}>
+                                                                   value="{{$count}}"{{if or (eq $.Section11Count2 (printf "%d" $count)) (and (eq $.Section11Count2 "") (eq $count $.AttorneyCount ))}} checked{{end}}>
                                                             <label class="govuk-label govuk-radios__label" for="f-section11Count2-{{$count}}">{{$count}}</label>
                                                         </div>
                                                     {{ end }}

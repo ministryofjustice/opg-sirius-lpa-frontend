@@ -31,6 +31,16 @@ describe("Edit a document", () => {
         id: 800,
         caseType: "LPA",
         donor: { id: 33 },
+        attorneys: [
+          { id: 1, systemStatus: true },
+          { id: 2, systemStatus: false },
+        ],
+        replacementAttorneys: [{ id: 3 }],
+        trustCorporations: [
+          { id: 4, systemStatus: true },
+          { id: 4, systemStatus: false },
+          { id: 4, systemStatus: false, isReplacementAttorney: true },
+        ],
       },
     });
     cy.addMock("/lpa-api/v1/lpas/800/documents?type[]=Draft", "GET", {
@@ -200,5 +210,51 @@ describe("Edit a document", () => {
     cy.get("#documentTextEditor").contains("Test content");
 
     cy.contains("button", "Publish draft").click();
+  });
+
+  it("defaults to one section 11 when there is only one attorney when section 11 is selected", () => {
+    cy.addMock("/lpa-api/v1/cases/800", "GET", {
+      status: 200,
+      body: {
+        id: 800,
+        caseType: "LPA",
+        donor: { id: 33 },
+        attorneys: [{ id: 1, systemStatus: true }],
+      },
+    });
+    cy.visit("/update-document?id=800&case=lpa");
+
+    cy.get("#insert-blank-sections").check();
+    cy.get("#f-blankSections").check();
+    cy.get("#f-section11Count1-1").should("be.checked");
+  });
+
+  it("defaults to one section 11 when there is only one attorney when section 11+15 is selected", () => {
+    cy.addMock("/lpa-api/v1/cases/800", "GET", {
+      status: 200,
+      body: {
+        id: 800,
+        caseType: "LPA",
+        donor: { id: 33 },
+        attorneys: [{ id: 1, systemStatus: true }],
+      },
+    });
+    cy.visit("/update-document?id=800&case=lpa");
+
+    cy.get("#insert-blank-sections").check();
+    cy.get("#f-blankSections-3").check();
+    cy.get("#f-section11Count3-1").should("be.checked");
+  });
+
+  it("preselects the section 11 count that is equal to the number of attorneys when sections 10+11 are selected", () => {
+    cy.get("#insert-blank-sections").check();
+    cy.get("#f-blankSections-2").check();
+    cy.get("#f-section11Count2-4").should("be.checked");
+  });
+
+  it("preselects the section 11 count that is equal to the number of attorneys when sections 10+11+15 are selected", () => {
+    cy.get("#insert-blank-sections").check();
+    cy.get("#f-blankSections-4").check();
+    cy.get("#f-section11Count4-4").should("be.checked");
   });
 });
