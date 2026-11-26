@@ -1,5 +1,5 @@
 describe("Edit a document", () => {
-  const visitWithNotifySettings = (sendingLettersViaNotify, usesNotify) => {
+  const visitWithNotifySettings = (usesNotify) => {
     cy.addMock("/lpa-api/v1/templates/lpa", "GET", {
       status: 200,
       body: {
@@ -7,16 +7,6 @@ describe("Edit a document", () => {
           label: "LPA Registered Notification",
           inserts: {},
           govukNotify: usesNotify,
-        },
-      },
-    });
-
-    cy.addMock("/config", "GET", {
-      status: 200,
-      body: {
-        featureToggles: {
-          poasBlankSections: true,
-          poasSendingLettersViaNotify: sendingLettersViaNotify,
         },
       },
     });
@@ -68,16 +58,6 @@ describe("Edit a document", () => {
       },
     });
 
-    cy.addMock("/config", "GET", {
-      status: 200,
-      body: {
-        featureToggles: {
-          poasBlankSections: true,
-          poasSendingLettersViaNotify: false,
-        },
-      },
-    });
-
     cy.visit("/update-document?id=800&case=lpa");
   });
 
@@ -97,7 +77,7 @@ describe("Edit a document", () => {
   });
 
   it("shows the send warning and button when the template uses Notify but the toggle is off", () => {
-    visitWithNotifySettings(false, true);
+    visitWithNotifySettings(true);
 
     cy.contains(
       "When you publish this letter it will automatically be sent via GOV.UK Notify",
@@ -108,7 +88,7 @@ describe("Edit a document", () => {
   });
 
   it("shows the publish button without a warning when the toggle is on but the template does not use Notify", () => {
-    visitWithNotifySettings(true, false);
+    visitWithNotifySettings(false);
 
     cy.contains("button", "Publish draft").should("exist");
     cy.contains("button", "Publish and post via Notify").should("not.exist");
@@ -117,7 +97,7 @@ describe("Edit a document", () => {
   });
 
   it("shows separate publish and send buttons when the toggle is on and the template uses Notify", () => {
-    visitWithNotifySettings(true, true);
+    visitWithNotifySettings(true);
 
     cy.contains(
       "When you publish this letter it will automatically be sent via GOV.UK Notify",
