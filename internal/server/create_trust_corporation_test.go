@@ -28,11 +28,6 @@ func (m *mockCreateTrustCorporationClient) CreateTrustCorporation(ctx sirius.Con
 	return args.Error(0)
 }
 
-func (m *mockCreateTrustCorporationClient) UpdateTrustCorporation(ctx sirius.Context, trustCorporationId int, trustCorporation sirius.TrustCorporation) error {
-	args := m.Called(ctx, trustCorporationId, trustCorporation)
-	return args.Error(0)
-}
-
 func TestGetCreateTrustCorporation(t *testing.T) {
 	flowCases := []struct {
 		name      string

@@ -62,7 +62,7 @@ describe("Case info panel on the header bar", () => {
     cy.contains("Melanie Vanvolkenburg").should("exist");
 
     cy.contains("Appointment type").should("exist");
-    cy.contains("Singular").should("exist");
+    cy.contains("One attorney appointed").should("exist");
 
     cy.contains("LST choice").should("exist");
     cy.contains("Option A").should("exist");
