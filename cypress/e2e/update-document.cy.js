@@ -1,5 +1,5 @@
 describe("Edit a document", () => {
-  const visitWithNotifySettings = (sendingLettersViaNotify, usesNotify) => {
+  const visitWithNotifySettings = (usesNotify) => {
     cy.addMock("/lpa-api/v1/templates/lpa", "GET", {
       status: 200,
       body: {
@@ -7,16 +7,6 @@ describe("Edit a document", () => {
           label: "LPA Registered Notification",
           inserts: {},
           govukNotify: usesNotify,
-        },
-      },
-    });
-
-    cy.addMock("/config", "GET", {
-      status: 200,
-      body: {
-        featureToggles: {
-          poasBlankSections: true,
-          poasSendingLettersViaNotify: sendingLettersViaNotify,
         },
       },
     });
@@ -68,16 +58,6 @@ describe("Edit a document", () => {
       },
     });
 
-    cy.addMock("/config", "GET", {
-      status: 200,
-      body: {
-        featureToggles: {
-          poasBlankSections: true,
-          poasSendingLettersViaNotify: false,
-        },
-      },
-    });
-
     cy.visit("/update-document?id=800&case=lpa");
   });
 
@@ -86,38 +66,32 @@ describe("Edit a document", () => {
     cy.contains("button", "Save draft");
     cy.contains("button", "Preview draft");
     cy.contains("button", "Delete draft");
-    cy.contains("button", "Publish draft");
+    cy.contains("button", "Publish");
     cy.contains("button", "Publish and post via Notify").should("not.exist");
     cy.contains("button", "Publish and Send").should("not.exist");
-    cy.contains(
-      "When you publish this letter it will automatically be sent via GOV.UK Notify",
-    ).should("not.exist");
     cy.contains("button", "Save and exit");
     cy.contains("span", "Insert blank sections of the LPA");
   });
 
-  it("shows the send warning and button when the template uses Notify but the toggle is off", () => {
-    visitWithNotifySettings(false, true);
+  it("button when the template uses Notify", () => {
+    visitWithNotifySettings(true);
 
-    cy.contains(
-      "When you publish this letter it will automatically be sent via GOV.UK Notify",
-    ).should("exist");
-    cy.contains("button", "Publish and Send").should("exist");
+    cy.contains("button", "Publish").should("exist");
     cy.contains("button", "Publish draft").should("not.exist");
-    cy.contains("button", "Publish and post via Notify").should("not.exist");
+    cy.contains("button", "Publish and post via Notify").should("exist");
   });
 
-  it("shows the publish button without a warning when the toggle is on but the template does not use Notify", () => {
-    visitWithNotifySettings(true, false);
+  it("shows the publish button without a warning the template does not use Notify", () => {
+    visitWithNotifySettings(false);
 
-    cy.contains("button", "Publish draft").should("exist");
+    cy.contains("button", "Publish").should("exist");
     cy.contains("button", "Publish and post via Notify").should("not.exist");
     cy.contains("button", "Publish and Send").should("not.exist");
     cy.contains("When you publish this letter").should("not.exist");
   });
 
   it("shows separate publish and send buttons when the toggle is on and the template uses Notify", () => {
-    visitWithNotifySettings(true, true);
+    visitWithNotifySettings(true);
 
     cy.contains(
       "When you publish this letter it will automatically be sent via GOV.UK Notify",
@@ -143,7 +117,7 @@ describe("Edit a document", () => {
     cy.contains("button", "Save draft");
     cy.contains("button", "Preview draft");
     cy.contains("button", "Delete draft");
-    cy.contains("button", "Publish draft");
+    cy.contains("button", "Publish");
     cy.contains("button", "Save and exit");
     cy.contains("span", "Insert blank sections of the LPA").should("not.exist");
   });
@@ -199,6 +173,6 @@ describe("Edit a document", () => {
     cy.contains("1: 15/12/2022 13:41:04: Consuela Aysien: LP-A");
     cy.get("#documentTextEditor").contains("Test content");
 
-    cy.contains("button", "Publish draft").click();
+    cy.contains("button", "Publish").click();
   });
 });
