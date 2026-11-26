@@ -58,11 +58,6 @@ func (m *mockUpdateDocumentClient) DocumentTemplates(ctx sirius.Context, caseTyp
 	return args.Get(0).([]sirius.DocumentTemplateData), args.Error(1)
 }
 
-func (m *mockUpdateDocumentClient) FeatureToggles(ctx sirius.Context) (sirius.FeatureToggles, error) {
-	args := m.Called(ctx)
-	return args.Get(0).(sirius.FeatureToggles), args.Error(1)
-}
-
 func TestGetUpdateDocument(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa", "digital_lpa", "lpa_htmx"} {
 		t.Run(caseType, func(t *testing.T) {
@@ -107,14 +102,10 @@ func TestGetUpdateDocument(t *testing.T) {
 					client.
 						On("DocumentTemplates", mock.Anything, sirius.CaseType(actualCaseType)).
 						Return(documentTemplates, nil)
-					client.
-						On("FeatureToggles", mock.Anything).
-						Return(sirius.FeatureToggles{"poasSendingLettersViaNotify": sendingLettersViaNotify}, nil)
 
 					template := &mockTemplate{}
 					templateData := updateDocumentData{
 						IsPartial:               htmx,
-						SendingLettersViaNotify: sendingLettersViaNotify,
 						Case:                    caseItem,
 						DonorId:                 1,
 						Documents:               documents,
@@ -190,9 +181,6 @@ func TestPostSaveDocument(t *testing.T) {
 			client.
 				On("DocumentTemplates", mock.Anything, sirius.CaseType(caseType)).
 				Return([]sirius.DocumentTemplateData{}, nil)
-			client.
-				On("FeatureToggles", mock.Anything).
-				Return(sirius.FeatureToggles{}, nil)
 
 			template := &mockTemplate{}
 			templateData := updateDocumentData{
@@ -273,9 +261,6 @@ func TestPostDeleteDocument(t *testing.T) {
 			client.
 				On("DeleteDocument", mock.Anything, document.UUID).
 				Return(nil)
-			client.
-				On("FeatureToggles", mock.Anything).
-				Return(sirius.FeatureToggles{}, nil)
 
 			template := &mockTemplate{}
 			errExample = nil
@@ -402,9 +387,6 @@ func TestPostPublishDocument(t *testing.T) {
 					client.
 						On("Case", mock.Anything, 544).
 						Return(caseItem, nil)
-					client.
-						On("FeatureToggles", mock.Anything).
-						Return(sirius.FeatureToggles{}, nil)
 
 					template := &mockTemplate{}
 					errExample = nil
@@ -515,9 +497,6 @@ func TestPostPreviewDocument(t *testing.T) {
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
 		Return([]sirius.DocumentTemplateData{}, nil)
-	client.
-		On("FeatureToggles", mock.Anything).
-		Return(sirius.FeatureToggles{}, nil)
 
 	template := &mockTemplate{}
 
@@ -673,9 +652,6 @@ func TestGetCreateDocumentWhenFailureOnDocuments(t *testing.T) {
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
 		Return([]sirius.DocumentTemplateData{}, nil)
-	client.
-		On("FeatureToggles", mock.Anything).
-		Return(sirius.FeatureToggles{}, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=535&case=lpa", nil)
 	w := httptest.NewRecorder()
@@ -712,9 +688,6 @@ func TestGetCreateDocumentWhenFailureOnDocumentByUUID(t *testing.T) {
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
 		Return([]sirius.DocumentTemplateData{}, nil)
-	client.
-		On("FeatureToggles", mock.Anything).
-		Return(sirius.FeatureToggles{}, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=843&case=lpa", nil)
 	w := httptest.NewRecorder()
@@ -751,9 +724,6 @@ func TestGetUpdateDocumentWhenTemplateErrors(t *testing.T) {
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
 		Return([]sirius.DocumentTemplateData{}, nil)
-	client.
-		On("FeatureToggles", mock.Anything).
-		Return(sirius.FeatureToggles{}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -860,9 +830,6 @@ func TestPostPublishDocumentWithBlankSections(t *testing.T) {
 			client.
 				On("DocumentTemplates", mock.Anything, sirius.CaseType("lpa")).
 				Return([]sirius.DocumentTemplateData{}, nil)
-			client.
-				On("FeatureToggles", mock.Anything).
-				Return(sirius.FeatureToggles{}, nil)
 
 			template := &mockTemplate{}
 			template.
@@ -945,9 +912,6 @@ func TestPostDocumentWithBlankSectionsWhenNoSectionsSelected(t *testing.T) {
 			client.
 				On("DocumentTemplates", mock.Anything, sirius.CaseType("lpa")).
 				Return([]sirius.DocumentTemplateData{}, nil)
-			client.
-				On("FeatureToggles", mock.Anything).
-				Return(sirius.FeatureToggles{}, nil)
 
 			template := &mockTemplate{}
 			template.
@@ -1023,9 +987,6 @@ func TestPostDocumentWithBlankSectionsWhenSection11SelectedButNoCount(t *testing
 			client.
 				On("DocumentTemplates", mock.Anything, sirius.CaseType("lpa")).
 				Return([]sirius.DocumentTemplateData{}, nil)
-			client.
-				On("FeatureToggles", mock.Anything).
-				Return(sirius.FeatureToggles{}, nil)
 
 			template := &mockTemplate{}
 			template.
@@ -1103,9 +1064,6 @@ func TestPostDocumentWithBlankSectionsWhenSection11And15SelectedButNoCount(t *te
 			client.
 				On("DocumentTemplates", mock.Anything, sirius.CaseType("lpa")).
 				Return([]sirius.DocumentTemplateData{}, nil)
-			client.
-				On("FeatureToggles", mock.Anything).
-				Return(sirius.FeatureToggles{}, nil)
 
 			template := &mockTemplate{}
 			template.
@@ -1228,9 +1186,6 @@ func TestGetAttorneyCount(t *testing.T) {
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseType("lpa")).
 		Return(documentTemplates, nil)
-	client.
-		On("FeatureToggles", mock.Anything).
-		Return(sirius.FeatureToggles{}, nil)
 
 	template := &mockTemplate{}
 	templateData := updateDocumentData{

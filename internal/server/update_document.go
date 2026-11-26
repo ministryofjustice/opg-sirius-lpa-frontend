@@ -21,7 +21,6 @@ type UpdateDocumentClient interface {
 	DeleteDocument(ctx sirius.Context, uuid string) error
 	CreateDocument(ctx sirius.Context, caseID int, document sirius.Document, docType string, blankSections []string, sendViaNotify bool) (sirius.Document, error)
 	DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error)
-	FeatureToggles(ctx sirius.Context) (sirius.FeatureToggles, error)
 }
 
 type updateDocumentData struct {
@@ -40,23 +39,21 @@ type updateDocumentData struct {
 	DownloadUUID string
 	DonorId      int
 
-	Section11               string
-	Section10And11          string
-	Section15               string
-	Section11And15          string
-	Section10And11And15     string
-	Section12And13And15     string
-	HasBlankSections        string
-	SelectedBlankSections   string
-	Section11Count1         string
-	Section11Count2         string
-	Section11Count3         string
-	Section11Count4         string
-	BlankSectionsEnabled    bool
-	SendingLettersViaNotify bool
-	AttorneyCount           int
-	CreatedDocument         sirius.Document
-	NotifyWarning           string
+	Section11             string
+	Section10And11        string
+	Section15             string
+	Section11And15        string
+	Section10And11And15   string
+	Section12And13And15   string
+	HasBlankSections      string
+	SelectedBlankSections string
+	Section11Count1       string
+	Section11Count2       string
+	Section11Count3       string
+	Section11Count4       string
+	AttorneyCount         int
+	CreatedDocument       sirius.Document
+	NotifyWarning         string
 }
 
 func publishDraftDocument(
@@ -201,12 +198,6 @@ func UpdateDocument(client UpdateDocumentClient, tmpl template.Template) Handler
 			Section11And15:      Section11And15,
 			Section10And11And15: Section10And11And15,
 			Section12And13And15: Section12And13And15,
-		}
-
-		featureToggles, err := client.FeatureToggles(ctx)
-		if err == nil {
-			data.BlankSectionsEnabled = featureToggles.Enabled("poasBlankSections")
-			data.SendingLettersViaNotify = featureToggles.Enabled("poasSendingLettersViaNotify")
 		}
 
 		caseItem, err := client.Case(ctx, caseID)
