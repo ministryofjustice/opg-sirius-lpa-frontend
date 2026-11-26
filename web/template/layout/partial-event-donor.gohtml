@@ -81,9 +81,9 @@
                             {{ if eq $fieldName "dob" }}
                                 <li>
                                     Date of birth:
-                                    {{ parseAndFormatDate $oldValue.date "2006-01-02 00:00:00.000000" "02/01/2006" }}
+                                    {{ parseAndFormatDate $oldValue.date "2006-01-02 15:04:05" "02/01/2006" }}
                                     changed to:
-                                    {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006" }}
+                                    {{ parseAndFormatDate $newValue.date "2006-01-02 15:04:05" "02/01/2006" }}
                                 </li>
                             {{ else }}
                                 <li>
@@ -94,7 +94,7 @@
                         {{ else }} {{/* This is being translated as a map, due to the old value being null, so only indexes "1" */}}
                         {{ $newValue := index $changeValues "1" }}
                         {{ if eq $fieldName "dob" }}
-                            <li>Date of birth: {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006" }}</li>
+                            <li>Date of birth: {{ parseAndFormatDate $newValue.date "2006-01-02 15:04:05" "02/01/2006" }}</li>
                         {{ else }}
                             {{/* Shouldn't hit this in Donor event but added in case of old events data */}}
                             <li>{{ camelcaseToSentence $fieldName }}: {{ $newValue }}</li>
