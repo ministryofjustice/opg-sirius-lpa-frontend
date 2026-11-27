@@ -1,4 +1,3 @@
-$person-info-panel-blue: #38669e;
 $person-info-selected-blue: govuk-colour("blue", $variant: "shade-50");
 $person-info-hover-background: govuk-colour("black", $variant: "tint-95");
 $person-info-hover-text: govuk-colour("black");
@@ -8,16 +7,13 @@ $person-info-row-padding: 10px;
 $person-info-column-gap: 20px;
 $person-info-edge: 15px;
 $person-info-tag-width: 4.75rem;
-$person-info-visible-rows: 10.5;
-$person-info-list-max-height: $person-info-row-height *
-  $person-info-visible-rows;
-
-.sirius-header__dropdown-panel:has(.app-person-info) {
-  background: $person-info-panel-blue;
-}
 
 .app-person-info {
-  padding: 15px 0 25px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 15px 0 0;
   color: $person-info-text;
   font-family: $govuk-font-family;
   font-size: 1rem;
@@ -26,6 +22,7 @@ $person-info-list-max-height: $person-info-row-height *
 
 .app-person-info__heading {
   @include govuk-font($size: 19, $weight: bold);
+  flex-shrink: 0;
   margin: 0 0 govuk-spacing(3) $person-info-edge;
   color: $person-info-text;
 }
@@ -33,10 +30,13 @@ $person-info-list-max-height: $person-info-row-height *
 .app-person-info__container {
   display: grid;
   grid-template-columns: minmax(30rem, max-content) 1fr;
+  grid-template-rows: minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
 }
 
 .app-person-info__people {
-  max-height: $person-info-list-max-height;
+  min-height: 0;
   overflow-y: auto;
 
   &:focus-visible {
@@ -140,13 +140,20 @@ $person-info-list-max-height: $person-info-row-height *
 
 .app-person-info__details {
   min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
   padding: 0 $person-info-edge;
   background-color: $person-info-selected-blue;
+
+  &:focus-visible {
+    outline: 3px solid $govuk-focus-colour;
+    outline-offset: -3px;
+  }
 
   & .app-person-info__details-heading {
     box-sizing: border-box;
     height: $person-info-row-height;
-    margin: 0;
+    margin: 0 0 6px;
     padding: $person-info-row-padding 0;
     border-bottom: 1px solid $person-info-text;
     color: $person-info-text;
@@ -167,8 +174,8 @@ $person-info-list-max-height: $person-info-row-height *
 
   & .govuk-summary-list__key,
   & .govuk-summary-list__value {
-    padding-top: $person-info-row-padding;
-    padding-bottom: $person-info-row-padding;
+    padding-top: 4px;
+    padding-bottom: 4px;
   }
 
   & .govuk-summary-list__key {
