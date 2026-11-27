@@ -18,7 +18,7 @@
                     {{ $newValue := index $v 1 }}
                     {{ if not $oldValue }}
                         {{ if isDateMap $newValue }}
-                            <li>{{ investigationEventProperty $k }}: {{ parseAndFormatDate (index $newValue "date") "2006-01-02 00:00:00.000000" "02/01/2006" }}</li>
+                            <li>{{ investigationEventProperty $k }}: {{ parseAndFormatDate (index $newValue "date") "2006-01-02 15:04:05" "02/01/2006" }}</li>
                         {{ else }}
                             <li>{{ investigationEventProperty $k }}: {{ $newValue }}</li>
                         {{ end }}
@@ -26,7 +26,7 @@
                 {{ else }}
                     {{ $newValue := index $v "1" }}
                     {{ if isDateMap $newValue  }}
-                        <li>{{ investigationEventProperty $k }}: {{ parseAndFormatDate (index $newValue "date") "2006-01-02 00:00:00.000000" "02/01/2006" }}</li>
+                        <li>{{ investigationEventProperty $k }}: {{ parseAndFormatDate (index $newValue "date") "2006-01-02 15:04:05" "02/01/2006" }}</li>
                     {{ else }}
                         <li>{{ investigationEventProperty $k }}: {{ $newValue }}</li>
                     {{ end }}
@@ -39,7 +39,7 @@
                     {{ $newValue := index $v 1 }}
                     {{ if $oldValue }}
                         {{ if isDateMap $oldValue  }}
-                            <li>{{ investigationEventProperty $k }}: {{ parseAndFormatDate (index $oldValue "date") "2006-01-02 00:00:00.000000" "02/01/2006" }} <strong>changed to</strong> {{ parseAndFormatDate (index $newValue "date") "2006-01-02 00:00:00.000000" "02/01/2006" }}</li>
+                            <li>{{ investigationEventProperty $k }}: {{ parseAndFormatDate (index $oldValue "date") "2006-01-02 15:04:05" "02/01/2006" }} <strong>changed to</strong> {{ parseAndFormatDate (index $newValue "date") "2006-01-02 15:04:05" "02/01/2006" }}</li>
                         {{ else }}
                             <li>{{ investigationEventProperty $k }}: {{ $oldValue }} <strong>changed to</strong> {{ $newValue }}</li>
                         {{ end }}

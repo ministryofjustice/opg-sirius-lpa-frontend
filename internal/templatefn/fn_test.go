@@ -45,6 +45,15 @@ func TestParseAndFormatDate(t *testing.T) {
 
 	val = fn("2024-04-11T14:00:39.361141055Z", "2006-01-02T15:04:05Z", "2 January 2006")
 	assert.Equal(t, "11 April 2024", val)
+
+	val = fn("2026-11-17 17:28:30.787678", "2006-01-02 15:04:05", "02/01/2006")
+	assert.Equal(t, "17/11/2026", val)
+
+	val = fn("2026-11-01 00:00:00.000000", "2006-01-02 15:04:05", "02/01/2006")
+	assert.Equal(t, "01/11/2026", val)
+
+	val = fn("2026-11-17 17:28:30", "2006-01-02 15:04:05", "02/01/2006")
+	assert.Equal(t, "17/11/2026", val)
 }
 
 func TestIsChildLinked(t *testing.T) {
