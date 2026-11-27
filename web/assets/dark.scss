@@ -243,12 +243,7 @@ $color-dark-bg-grey: #363639;
       color: govuk-colour("white");
     }
 
-    [aria-sort="none"] button svg {
-      color: govuk-colour("black", $variant: "tint-50");
-    }
-
-    [aria-sort] button:focus,
-    [aria-sort] button:focus svg {
+    [aria-sort] button:focus {
       color: govuk-colour("black");
     }
   }
